@@ -1,0 +1,50 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    -if(anarestani)
+                        li انارستانی عزیز به پنل کاربری خود خوش آمدید
+                    -else
+                        li به پنل کاربری خود خوش آمدید
+                    
+        -}
+    h1.title تردد ماه #{get_persian_month(now.month)}
+    .commute-area
+        -for(var i=0; i<thisMonth.length; i++){
+            .day-view(id="day#{i}") #{day_in_week(thisMonth[i].date)} #{thisMonth[i].day} #{get_persian_month(thisMonth[i].month)} ماه
+                i.fa.fa-chevron-down.chev
+            .commute(id="commute#{i}")
+                table
+                    tr 
+                        th شماره دستگاه ورود
+                        th شماره دستگاه خروج
+                        th زمان ورود
+                        th زمان خروج
+                        th وضعیت
+                    tr 
+                        td 1
+                        td 2
+                        td 13:45
+                        td 14:00
+                        td 
+                            .green صحیح
+                    tr 
+                        td 1
+                        td 
+                            .red -
+                        td 13:45
+                        td 
+                            .red -
+                        td 
+                            .red ناقص
+                    
+        -}
+    script(src="/js/dashboard.js") 

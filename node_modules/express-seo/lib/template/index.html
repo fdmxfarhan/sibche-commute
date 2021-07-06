@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+    <% for (var i in langs) { var lang = langs[i]; %>
+      <link rel="alternate" hreflang="<%- lang %>" href="/?lang=<%- lang %>">
+    <% } %>
+
+    <% for (var property in graph) { var content = graph[property]; %>
+      <% if (property === 'title') { %>
+        <title><%= content %></title>
+      <% } else { %>
+        <meta property="<%- property %>" content="<%- content %>">
+      <% } %>
+    <% } %>
+  </head>
+  <body>
+    <%- html %>
+  </body>
+</html>
