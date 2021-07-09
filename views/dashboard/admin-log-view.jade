@@ -1,0 +1,90 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li به پنل مدیریت خوش آمدید
+        -}
+    .log-state
+        -if(log.accepted)
+            .green تایید شده
+        -else
+            .red تایید نشده
+    -if(!log.accepted){
+        a.accept-log(href="/dashboard/accept-log?logID=#{log._id}") تایید و ثبت ترددها
+    -}
+    .tab-view 
+        .links 
+            .tab-link#tab1-btn.active دستگاه 1
+            .tab-link#tab2-btn دستگاه 2
+            .tab-link#tab3-btn دستگاه 3
+            .tab-link#tab4-btn دستگاه 4
+        .tab1 
+            table.log-view 
+                tr 
+                    th ردیف
+                    th شماره پرسنل
+                    th شماره دستگاه
+                    th تاریخ ساعت تردد
+                -for(var i=1; i<log.log1.length - 1; i++){
+                    tr 
+                        td= i
+                        td= log.log1[i][2]
+                        td= log.log1[i][1]
+                        td= log.log1[i][6]
+                -}
+        .tab2
+            table.log-view 
+                tr 
+                    th ردیف
+                    th شماره پرسنل
+                    th شماره دستگاه
+                    th تاریخ ساعت تردد
+                -for(var i=1; i<log.log2.length - 1; i++){
+                    tr 
+                        td= i
+                        td= log.log2[i][2]
+                        td= log.log2[i][1]
+                        td= log.log2[i][6]
+                -}
+        .tab3
+            table.log-view 
+                tr 
+                    th ردیف
+                    th شماره پرسنل
+                    th شماره دستگاه
+                    th تاریخ ساعت تردد
+                -for(var i=1; i<log.log3.length - 1; i++){
+                    tr 
+                        td= i
+                        td= log.log3[i][2]
+                        td= log.log3[i][1]
+                        td= log.log3[i][6]
+                -}
+        .tab4 
+            table.log-view 
+                tr 
+                    th ردیف
+                    th شماره پرسنل
+                    th شماره دستگاه
+                    th تاریخ ساعت تردد
+                -for(var i=1; i<log.log4.length - 1; i++){
+                    tr 
+                        td= i
+                        td= log.log4[i][2]
+                        td= log.log4[i][1]
+                        td= log.log4[i][6]
+                -}
+        
+
+
+    script(src="/js/log-view.js") 
+
+

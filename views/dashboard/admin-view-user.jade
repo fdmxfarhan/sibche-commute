@@ -1,0 +1,42 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li به پنل مدیریت خوش آمدید
+        -}
+    h1.title تردد پرسنل شماره #{personelID}
+    .log-list-view
+        table 
+            tr 
+                th ردیف
+                th شماره پرسنلی
+                th تاریخ
+                th ساعت
+                th نوع تردد
+                th نام دستگاه
+            -for(var i=0; i<commutes.length; i++){
+                tr 
+                    td= i+1
+                    td= commutes[i].personelID
+                    td #{commutes[i].j_date.year}/#{commutes[i].j_date.month}/#{commutes[i].j_date.day}
+                    td #{commutes[i].time.hour}:#{commutes[i].time.minute}:#{commutes[i].time.second}
+                    td 
+                        -if(commutes[i].deviceID%2 == 0)
+                            .green ورود
+                        -else 
+                            .red خروج
+                    td= commutes[i].deviceID
+                    
+            -}
+    include upload-log-popup
+    script(src="/js/dashboard.js") 
+
+

@@ -18,5 +18,16 @@ $(document).ready(function(){
         });
     });
 
-    
+    $('a.upload-log-btn').click(() => {
+        $('#upload-log').fadeIn(500);
+        modal.fadeIn(500);
+    });
+    modal.click(() => {
+        $('#upload-log').fadeOut(500);
+        modal.fadeOut(500);
+    })
+    $('.close-popup').click(() => {
+        $('#upload-log').fadeOut(500);
+        modal.fadeOut(500);
+    })
 });

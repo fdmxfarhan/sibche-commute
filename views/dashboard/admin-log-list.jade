@@ -1,0 +1,42 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li به پنل مدیریت خوش آمدید
+        -}
+    a.upload-log-btn آپلود لاگ جدید
+    .log-list-view
+        table 
+            tr 
+                th ردیف
+                th عنوان
+                th تاریخ ثبت
+                th وضعیت
+                th مشاهده
+            -for(var i=0; i<logs.length; i++){
+                tr 
+                    td= i+1
+                    td= logs[i].title
+                    td #{logs[i].j_date.year}/#{logs[i].j_date.month}/#{logs[i].j_date.day}
+                    td
+                        -if(logs[i].accepted)
+                            .green تایید شده
+                        -else
+                            .red تایید نشده
+                    td
+                        a(href="/dashboard/log-view?logID=#{logs[i]._id}") 
+                            i.fa.fa-eye
+
+            -}
+    include upload-log-popup
+    script(src="/js/dashboard.js") 
+
+

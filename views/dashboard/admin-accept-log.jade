@@ -1,0 +1,19 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li به پنل مدیریت خوش آمدید
+        -}
+    a.upload-log-btn آپلود لاگ دستگاه ها
+    
+    script(src="/js/dashboard.js") 
+
+

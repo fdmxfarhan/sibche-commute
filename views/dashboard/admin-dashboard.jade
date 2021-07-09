@@ -10,77 +10,21 @@ block content
             .success-msg
                 i.fa.fa-times.close-success-msg
                 ul 
-                    li به پنل کاربری خود خوش آمدید
+                    li به پنل مدیریت خوش آمدید
         -}
-        -if(false){
-            .notif-msg
-                i.fa.fa-times.close-notif-msg
-                ul 
-                    li شما n صورت حساب پرداخت نشده دارید. جهت پرداخت صورت حساب خود 
-                        a(href="#") اینجا 
-                        | را کلیک کنید.
-        -}
+    a.upload-log-btn آپلود لاگ دستگاه ها
 
-    .graph-cards-area
-        .card 
-            .title تعداد دوره ها
-            //- .number 100
-            .progress-circle.over50.p85
-                span 100
-                .left-half-clipper
-                    .first50-bar
-                    .value-bar
-        .card 
-            .title تعداد شرکت کنندگان
-            //- .number 200
-            .progress-circle.over50.p85
-                span 200
-                .left-half-clipper
-                    .first50-bar
-                    .value-bar
-        .card 
-            .title تعداد دوره ها
-            //- .number 100
-            .progress-circle.over50.p85
-                span 100
-                .left-half-clipper
-                    .first50-bar
-                    .value-bar
+    .cards-area
+        -for(var i=0; i<users.length; i++){
+            a(href="/dashboard/admin-view-user?personelID=#{users[i]}") 
+                .personel-card
+                    img(src="/img/avatar/2.png", alt="avatar")
+                    h1.name پرسنل شماره #{users[i]}
+                    h2.name فرحان دائمی
+                    //- .time 43 ساعت
+        -}
     
-    h1.title لیست دوره ها
-    .product-cards-area 
-        .card 
-            .image 
-                img(src="/img/classes/img-01.jpg")
-            .title دوره آموزشی 1
-            .text 
-                | در این قسمت توضیحات مورد نیاز در مورد دوره آموزشی نوشته می شود. با کلیک بر روی دکمه ثبت نام این دوره به لیست دوره ها اضافه شده و پس از پرداخت هزینه فعال می شود.
-            .price 100.000 تومان
-        .card 
-            .image 
-                img(src="/img/classes/img-02.png")
-            .title دوره آموزشی 1
-            .text 
-                | در این قسمت توضیحات مورد نیاز در مورد دوره آموزشی نوشته می شود. با کلیک بر روی دکمه ثبت نام این دوره به لیست دوره ها اضافه شده و پس از پرداخت هزینه فعال می شود.
-            .price 100.000 تومان
-        .card 
-            .image 
-                img(src="/img/classes/img-01.jpg")
-            .title دوره آموزشی 1
-            .text 
-                | در این قسمت توضیحات مورد نیاز در مورد دوره آموزشی نوشته می شود. با کلیک بر روی دکمه ثبت نام این دوره به لیست دوره ها اضافه شده و پس از پرداخت هزینه فعال می شود.
-            .price 100.000 تومان
-        .card 
-            .image 
-                img(src="/img/classes/img-02.png")
-            .title دوره آموزشی 1
-            .text 
-                | در این قسمت توضیحات مورد نیاز در مورد دوره آموزشی نوشته می شود. با کلیک بر روی دکمه ثبت نام این دوره به لیست دوره ها اضافه شده و پس از پرداخت هزینه فعال می شود.
-            .price 100.000 تومان
-        .card.add
-            i.fa.fa-plus.plus
-            .add-text افزودن دوره
-
+    include upload-log-popup
     
     script(src="/js/dashboard.js") 
 

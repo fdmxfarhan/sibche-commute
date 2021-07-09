@@ -1,0 +1,12 @@
+.popup-area#upload-log
+    .popup
+        i.fa.fa-times.close-popup
+        h1.popup-title آپلود لاگ دستگاه ها
+        form(action="/upload/log" enctype="multipart/form-data" method="POST") 
+            label(for="title") عنوان فایل:
+            input.text-input(type="text" name="title" required placeholder="عنوان فایل...")
+            br
+            .upload-area فایل خود را انتخاب کنید
+                i.fa.fa-cloud-upload
+                input.file(type="file" name="myFile" required)
+            input.submit(type="submit" value="آپلود")

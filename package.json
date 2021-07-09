@@ -19,6 +19,7 @@
     "express": "^4.17.1",
     "express-seo": "0.0.1",
     "express-session": "^1.17.1",
+    "extract-zip": "^2.0.1",
     "jade": "^1.11.0",
     "koa-seo": "^1.1.1",
     "mongodb": "^3.6.3",
@@ -28,7 +29,9 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "request": "^2.88.2",
-    "socket.io": "^4.0.1"
+    "socket.io": "^4.0.1",
+    "unrar": "^0.2.0",
+    "unrar-promise": "^2.0.1"
   },
   "devDependencies": {
     "mongoose": "^5.11.16",

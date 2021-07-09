@@ -14,4 +14,3 @@ var Commute = mongoose.model('Commute', CommuteSchema);
 
 module.exports = Commute;
 
-
