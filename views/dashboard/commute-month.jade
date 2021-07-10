@@ -94,7 +94,8 @@ block content
                                     .red ناقص
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=#{monthData[i].commutes[j]._id}&id2=undefined&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}else if(monthData[i].commutes[j] == 'undefined'){ 
                             tr 
                                 td
@@ -109,7 +110,8 @@ block content
                                     .red ناقص
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=undefined&id2=#{monthData[i].commutes[j+1]._id}&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}else if(monthData[i].commutes[j].Enter && !monthData[i].commutes[j+1].Enter ){
                             tr 
                                 td
@@ -122,7 +124,8 @@ block content
                                     .green صحیح
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=#{monthData[i].commutes[j]._id}&id2=#{monthData[i].commutes[j+1]._id}&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}else{
                             tr 
                                 td
@@ -135,7 +138,8 @@ block content
                                     .red خیلی ناقص
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=undefined&id2=undefined&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}
                     -}
         -}

@@ -453,6 +453,17 @@
     .day-view.holiday{
         background-color: rgb(208, 233, 232);
     }
+    a.clear-data{
+        color: red;
+        text-decoration: none;
+        margin-right: 5%;
+        position: absolute;
+        bottom: 1vw;
+    }
+    a.clear-data i{
+        padding-left: 0.4vw;
+    }
+
 }
 @media only screen and (max-width: 800px) {
     

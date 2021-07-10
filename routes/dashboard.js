@@ -311,6 +311,29 @@ router.get('/commute-month', ensureAuthenticated, (req, res, next) => {
     });
 });
 
+router.get('/admin-clear-data', ensureAuthenticated, (req, res, next) => {
+    if(req.user.role == 'admin'){
+        User.deleteMany({role: 'user'}, err => {
+            if(err) console.log(err);
+            Commute.deleteMany({}, err => {
+                if(err) console.log(err);
+                Log.updateMany({}, {$set: {accepted: false}}, (err, doc) => {
+                    if(err) console.log(err);
+                    res.redirect('/dashboard/log-list');
+                })
+            })
+        })
+    }
+});
 
+router.get('/remove-commute', ensureAuthenticated, (req, res, next) => {
+    if(req.user.role == 'admin'){
+        Commute.deleteOne({_id: req.query.id1}, err => {
+            Commute.deleteOne({_id: req.query.id2}, err => {
+                res.redirect(`/dashboard/admin-view-user?personelID=${req.query.personelID}&month=${req.query.month}`)
+            });
+        });
+    }
+});
 
 module.exports = router;
