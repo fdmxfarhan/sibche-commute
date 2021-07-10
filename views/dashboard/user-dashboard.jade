@@ -11,9 +11,14 @@ block content
                 i.fa.fa-times.close-success-msg
                 ul 
                     li به پنل کاربری خود خوش آمدید
-                    
         -}
-    h1.title تردد ماه #{get_persian_month(now.month)}
+    h1.title #{get_persian_month(parseInt(now.month))} ماه #{now.year}
+        a.prev(href="/dashboard/commute-month?month=#{parseInt(now.month) - 1}") 
+            i.fa.fa-chevron-right
+            | #{get_persian_month(parseInt(now.month)-1)}
+        a.next(href="/dashboard/commute-month?month=#{parseInt(now.month) + 1}") 
+            | #{get_persian_month(parseInt(now.month)+1)}
+            i.fa.fa-chevron-left
     .commute-area
         -for(var i=0; i<thisMonth.length; i++){
             .day-view(id="day#{i}") #{day_in_week(thisMonth[i].date)} #{thisMonth[i].day} #{get_persian_month(thisMonth[i].month)} ماه 

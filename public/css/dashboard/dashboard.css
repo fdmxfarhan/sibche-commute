@@ -40,6 +40,32 @@
         text-align: center;
         margin-top: 1vw;
         margin-bottom: 1vw;
+        position: relative;
+    }
+    h1.title .prev{
+        position: absolute;
+        top: 0.3vw;
+        color: var(--blue);
+        text-decoration: none;
+        font-family: 'iransans';
+        font-size: 1.2vw;
+        right: 1vw;
+    }
+    h1.title .next{
+        position: absolute;
+        top: 0.3vw;
+        color: var(--blue);
+        text-decoration: none;
+        font-family: 'iransans';
+        font-size: 1.2vw;
+        left: 1vw;
+    }
+    h1.title a i{
+        padding: 0 0.4vw;
+        font-size: 1vw;
+    }
+    h1.title a:hover{
+        color: salmon;
     }
     .product-cards-area{
         width: 85%;

@@ -28,6 +28,7 @@ const bcrypt = require('bcryptjs');
 //     }
 //     console.log(log1)
 // })
+
 var sortAlgorithm = (a, b) => {
     if(a.j_date.year == b.j_date.year){
         if(a.j_date.month == b.j_date.month){
@@ -61,7 +62,7 @@ router.get('/', ensureAuthenticated, (req, res, next) => {
         Commute.find({personelID: req.user.idNumber}, (err, commutes) => {
             commutes.sort(sortAlgorithm);
             var thisMonth = [];
-            for(var i=0; i<dateConvert.j_days_in_month[now.month]; i++){
+            for(var i=0; i<dateConvert.j_days_in_month[now.month-1]; i++){
                 var j_year = now.year;
                 var j_month = now.month;
                 var j_day = i+1;
@@ -211,5 +212,45 @@ router.get('/admin-view-user', ensureAuthenticated, (req, res, next) => {
         });
     }
 });
+
+router.get('/commute-month', ensureAuthenticated, (req, res, next) => {
+    var monthNum = req.query.month;
+    if(monthNum == 0)  res.redirect(`/dashboard/commute-month?month=${12}`);
+    if(monthNum == 13) res.redirect(`/dashboard/commute-month?month=${1}`);
+    greg = new Date(Date.now());
+    day = greg.getDate();
+    month = greg.getMonth() + 1;
+    year = greg.getFullYear();
+    jalali = dateConvert.gregorian_to_jalali(year, month, day);
+    var now = { year: jalali[0], month: jalali[1], day: jalali[2], date: greg};
+    Commute.find({personelID: req.user.idNumber}, (err, commutes) => {
+        commutes.sort(sortAlgorithm);
+        var monthData = [];
+        for(var i=0; i<dateConvert.j_days_in_month[monthNum-1]; i++){
+            var j_year = now.year;
+            var j_month = monthNum;
+            var j_day = i+1;
+            var j_date = dateConvert.jalali_to_gregorian(j_year, j_month, j_day);
+            var j_d = new Date(j_date[0], j_date[1]-1, j_date[2], 12, 0, 0, 0);
+            var thisCommutes = [];
+            for (let j = 0; j < commutes.length; j++) {
+                if(commutes[j].j_date.year == j_year && commutes[j].j_date.month == j_month && commutes[j].j_date.day == j_day)
+                    thisCommutes.push(commutes[j]);
+            }
+            monthData.push({year: j_year, month: j_month, day: j_day, date: j_d, commutes: thisCommutes});
+        }
+        res.render('./dashboard/commute-month', {
+            user: req.user,
+            now,
+            monthData,
+            get_persian_month: dateConvert.get_persian_month,
+            day_in_week: dateConvert.day_in_week,
+            j_days_in_month: dateConvert.j_days_in_month,
+            month: monthNum,
+        });
+    });
+});
+
+
 
 module.exports = router;

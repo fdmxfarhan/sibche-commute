@@ -1,0 +1,99 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li به پنل کاربری خود خوش آمدید
+        -}
+    h1.title #{get_persian_month(parseInt(month))} ماه #{now.year}
+        a.prev(href="/dashboard/commute-month?month=#{parseInt(month) - 1}") 
+            i.fa.fa-chevron-right
+            | #{get_persian_month(parseInt(month)-1)}
+        a.next(href="/dashboard/commute-month?month=#{parseInt(month) + 1}") 
+            | #{get_persian_month(parseInt(month)+1)}
+            i.fa.fa-chevron-left
+    .commute-area
+        -for(var i=0; i<monthData.length; i++){
+            .day-view(id="day#{i}") #{day_in_week(monthData[i].date)} #{monthData[i].day} #{get_persian_month(monthData[i].month)} ماه 
+                -var correct = 0, incorrect = 0;
+                -for(var j=0; j<monthData[i].commutes.length-1; j+=2){
+                    -if(monthData[i].commutes[j].Enter && !monthData[i].commutes[j+1].Enter ) correct++; 
+                    -else if(!monthData[i].commutes[j].Enter)    {incorrect++;monthData[i].commutes.splice(j  , 0, 'undefined');}
+                    -else if(monthData[i].commutes[j+1].Enter)   {incorrect++;monthData[i].commutes.splice(j+1, 0, 'undefined');}
+                    -else incorrect++;
+                -}
+                -if(correct > 0 || incorrect > 0){
+                    | (
+                    -if(correct > 0)
+                        .dark-green.inline #{correct} تردد صحیح
+                    -if(incorrect > 0)
+                        .red.inline #{incorrect} تردد ناقص
+                    | )
+                -}
+                i.fa.fa-chevron-down.chev
+            .commute(id="commute#{i}")
+                table
+                    tr 
+                        th 
+                            i.fa.fa-pencil
+                        th شماره دستگاه ورود
+                        th شماره دستگاه خروج
+                        th زمان ورود
+                        th زمان خروج
+                        th وضعیت
+                    -for(var j=0; j<monthData[i].commutes.length-1; j+=2){
+                        -if(monthData[i].commutes[j+1] == 'undefined'){ 
+                            tr 
+                                td
+                                    i.fa.fa-edit.edit
+                                td= monthData[i].commutes[j].deviceID
+                                td 
+                                    .red -
+                                td #{monthData[i].commutes[j].time.hour}:#{monthData[i].commutes[j].time.minute}:#{monthData[i].commutes[j].time.second}
+                                td 
+                                    .red -
+                                td 
+                                    .red ناقص
+                        -}else if(monthData[i].commutes[j] == 'undefined'){ 
+                            tr 
+                                td
+                                    i.fa.fa-edit.edit
+                                td 
+                                    .red -
+                                td= monthData[i].commutes[j+1].deviceID
+                                td 
+                                    .red -
+                                td #{monthData[i].commutes[j+1].time.hour}:#{monthData[i].commutes[j+1].time.minute}:#{monthData[i].commutes[j+1].time.second}
+                                td 
+                                    .red ناقص
+                        -}else if(monthData[i].commutes[j].Enter && !monthData[i].commutes[j+1].Enter ){
+                            tr 
+                                td
+                                    i.fa.fa-edit.edit
+                                td= monthData[i].commutes[j].deviceID
+                                td= monthData[i].commutes[j+1].deviceID
+                                td #{monthData[i].commutes[j].time.hour}:#{monthData[i].commutes[j].time.minute}:#{monthData[i].commutes[j].time.second}
+                                td #{monthData[i].commutes[j+1].time.hour}:#{monthData[i].commutes[j+1].time.minute}:#{monthData[i].commutes[j+1].time.second}
+                                td 
+                                    .green صحیح
+                        -}else{
+                            tr 
+                                td
+                                    i.fa.fa-edit.edit
+                                td= monthData[i].commutes[j].deviceID
+                                td= monthData[i].commutes[j+1].deviceID
+                                td #{monthData[i].commutes[j].time.hour}:#{monthData[i].commutes[j].time.minute}:#{monthData[i].commutes[j].time.second}
+                                td #{monthData[i].commutes[j+1].time.hour}:#{monthData[i].commutes[j+1].time.minute}:#{monthData[i].commutes[j+1].time.second}
+                                td 
+                                    .red خیلی ناقص
+                        -}
+                    -}
+        -}
+    script(src="/js/dashboard.js") 

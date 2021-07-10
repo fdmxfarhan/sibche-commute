@@ -125,6 +125,8 @@ function convertDate(date) {
 }
 
 function get_persian_month(month) {
+    if(month == 0)  month = 12;
+    if(month == 13) month = 1;
     switch (month) {
         case 1:
             return "فروردین";
