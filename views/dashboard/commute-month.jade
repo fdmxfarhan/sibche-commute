@@ -57,7 +57,7 @@ block content
                     -if(monthData[i].commutes[j].Enter) {start = monthData[i].commutes[j].time; break;}
                 -for(var j=monthData[i].commutes.length-1; j>0; j--)
                     -if(!monthData[i].commutes[j].Enter) {end = monthData[i].commutes[j].time; break;}
-                -total = deltaTime(start, end);
+                -var total = deltaTime(start, end);
                 -if((sum.hour * 60 * 60) + (sum.minute * 60) + (sum.second) != 0)
                     .sum-area 
                         .sum(id="sum#{i}") #{total.hour}:#{total.minute} / #{sum.hour}:#{sum.minute}
