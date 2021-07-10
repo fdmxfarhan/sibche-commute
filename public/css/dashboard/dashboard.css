@@ -1,6 +1,7 @@
 .green{color: rgb(0, 252, 0);}
+.dark-green{color: rgb(10, 168, 10);}
 .red{color: red;}
-
+.inline{display: inline;}
 @media only screen and (min-width: 800px) {
     .graph-cards-area{
         overflow: hidden;
@@ -134,6 +135,19 @@
         cursor: pointer;
         position: relative;
     }
+    .day-view .inline{
+        padding-right: 0.3vw;
+        font-size: 1vw;
+    }
+    .commute-area table td i.edit{
+        color: var(--blue);
+        cursor: pointer;
+        font-size: 1.2vw;
+        transition-duration: 500ms;
+    }
+    .commute-area table td i.edit:hover{
+        color: chocolate;
+    }
     .day-view:hover{background-color: salmon;}
     .day-view i.chev{
         position: absolute;
@@ -153,10 +167,12 @@
     .commute-area table th{
         font-size: 1.1vw;
         color: rgb(34, 34, 34);
+        background-color: transparent;
     }
     .commute-area table td{
         border-top: rgb(196, 196, 196) 0.1vw solid;
         padding: 0.3vw 0;
+        border-bottom: none;
     }
     
     .cards-area{

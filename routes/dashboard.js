@@ -9,6 +9,7 @@ const {unrar, list} = require('unrar-promise');
 const dateConvert = require('../config/dateConvert');
 const Log = require('../models/Log');
 const Commute = require('../models/Commute');
+const bcrypt = require('bcryptjs');
 
 // async function main(){
 
@@ -27,13 +28,24 @@ const Commute = require('../models/Commute');
 //     }
 //     console.log(log1)
 // })
-
-
-
-
-
-
-
+var sortAlgorithm = (a, b) => {
+    if(a.j_date.year == b.j_date.year){
+        if(a.j_date.month == b.j_date.month){
+            if(a.j_date.day == b.j_date.day){
+                if(a.time.hour == b.time.hour){
+                    if(a.time.minute == b.time.minute){
+                        return a.time.second - b.time.second;
+                    }
+                    return a.time.minute - b.time.minute;
+                }
+                return a.time.hour - b.time.hour;
+            }
+            return a.j_date.day - b.j_date.day;
+        }
+        return a.j_date.month - b.j_date.month;
+    }
+    return a.j_date.year - b.j_date.year;
+}
 
 router.get('/', ensureAuthenticated, (req, res, next) => {
     greg = new Date(Date.now());
@@ -42,28 +54,35 @@ router.get('/', ensureAuthenticated, (req, res, next) => {
     year = greg.getFullYear();
     jalali = dateConvert.gregorian_to_jalali(year, month, day);
     var now = { year: jalali[0], month: jalali[1], day: jalali[2], date: greg};
-    var thisMonth = [];
-    for(var i=0; i<dateConvert.j_days_in_month[now.month]; i++){
-        var j_year = now.year;
-        var j_month = now.month;
-        var j_day = i+1;
-        var j_date = dateConvert.jalali_to_gregorian(j_year, j_month, j_day);
-        var j_d = new Date(j_date[0], j_date[1]-1, j_date[2], 12, 0, 0, 0);
-        // console.log(j_date, j_d)
-        thisMonth.push({year: j_year, month: j_month, day: j_day, date: j_d});
-    }
+    
 
     if(req.user.role == 'user')
     {
-        res.render('./dashboard/user-dashboard', {
-            user: req.user,
-            login: req.query.login,
-            now,
-            thisMonth,
-            get_persian_month: dateConvert.get_persian_month,
-            day_in_week: dateConvert.day_in_week,
-            j_days_in_month: dateConvert.j_days_in_month,
-            
+        Commute.find({personelID: req.user.idNumber}, (err, commutes) => {
+            commutes.sort(sortAlgorithm);
+            var thisMonth = [];
+            for(var i=0; i<dateConvert.j_days_in_month[now.month]; i++){
+                var j_year = now.year;
+                var j_month = now.month;
+                var j_day = i+1;
+                var j_date = dateConvert.jalali_to_gregorian(j_year, j_month, j_day);
+                var j_d = new Date(j_date[0], j_date[1]-1, j_date[2], 12, 0, 0, 0);
+                var thisCommutes = [];
+                for (let j = 0; j < commutes.length; j++) {
+                    if(commutes[j].j_date.year == j_year && commutes[j].j_date.month == j_month && commutes[j].j_date.day == j_day)
+                        thisCommutes.push(commutes[j]);
+                }
+                thisMonth.push({year: j_year, month: j_month, day: j_day, date: j_d, commutes: thisCommutes});
+            }
+            res.render('./dashboard/user-dashboard', {
+                user: req.user,
+                login: req.query.login,
+                now,
+                thisMonth,
+                get_persian_month: dateConvert.get_persian_month,
+                day_in_week: dateConvert.day_in_week,
+                j_days_in_month: dateConvert.j_days_in_month,
+            });
         });
     }
     else if(req.user.role = 'admin')
@@ -121,7 +140,7 @@ router.get('/accept-log', ensureAuthenticated, (req, res, next) => {
             logs.forEach(logElement => {
                 if(logElement.length == 7 && !isNaN(parseInt(logElement[0]))){
                     var enter = false;
-                    if(logElement[1]%2 == 0) enter = true;
+                    if(logElement[1] == 2 || logElement[1] == 3) enter = true;
                     var dateTime = logElement[6].split(' ');
                     year = parseInt(dateTime[0].slice(0, 4));
                     month = parseInt(dateTime[0].slice(5, 7));
@@ -140,15 +159,42 @@ router.get('/accept-log', ensureAuthenticated, (req, res, next) => {
                         time: time,
                         deviceID: logElement[1],
                         Enter: enter,
+                        logID: req.query.logID,
                     });
                     newCommute.save().then().catch(err => {if(err) console.log(err);});
                 }
             });
 
             Log.updateMany({_id: req.query.logID}, {$set: {accepted: true}},(err, log) => {
-                res.redirect('/dashboard');
+                Commute.find({}, (err, commutes) => {
+                    users = [];
+                    for (let i = 0; i < commutes.length; i++) {
+                        if(users.indexOf(commutes[i].personelID) == -1)
+                            users.push(commutes[i].personelID);
+                    }
+                    // console.log(users);
+                    users.forEach(user => {
+                        User.findOne({idNumber: user}, (err, found) => {
+                            if(!found){
+                                var newUser = new User({
+                                    idNumber: user, 
+                                    password: '1234', 
+                                    fullname: `پرسنل ${user}`, 
+                                    firstName: `پرسنل`, 
+                                    lastName: `${user}`,
+                                    role: 'user',
+                                });
+                                bcrypt.genSalt(10, (err, salt) => bcrypt.hash(newUser.password, salt, (err, hash) => {
+                                    if(err) throw err;
+                                    newUser.password = hash;
+                                    newUser.save().then(user => {}).catch(err => console.log(err));
+                                }));
+                            }
+                        });
+                    });
+                    res.redirect('/dashboard');
+                });
             });
-
         });
     }
 });
@@ -156,24 +202,7 @@ router.get('/accept-log', ensureAuthenticated, (req, res, next) => {
 router.get('/admin-view-user', ensureAuthenticated, (req, res, next) => {
     if(req.user.role == 'admin'){
         Commute.find({personelID: req.query.personelID}, (err, commutes) => {
-            commutes.sort(function (a, b) {
-                if(a.j_date.year == b.j_date.year){
-                    if(a.j_date.month == b.j_date.month){
-                        if(a.j_date.day == b.j_date.day){
-                            if(a.time.hour == b.time.hour){
-                                if(a.time.minute == b.time.minute){
-                                    return a.time.second - b.time.second;
-                                }
-                                return a.time.minute - b.time.minute;
-                            }
-                            return a.time.hour - b.time.hour;
-                        }
-                        return a.j_date.day - b.j_date.day;
-                    }
-                    return a.j_date.month - b.j_date.month;
-                }
-                return a.j_date.year - b.j_date.year;
-            });
+            commutes.sort(sortAlgorithm);
             res.render('./dashboard/admin-view-user', {
                 user: req.user,
                 commutes,

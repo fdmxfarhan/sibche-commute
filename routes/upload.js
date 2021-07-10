@@ -105,27 +105,22 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                             year = greg.getFullYear();
                             jalali = dateConvert.gregorian_to_jalali(year, month, day);
                             var now = { year: jalali[0], month: jalali[1], day: jalali[2], date: greg};
-                            console.log(log1);
-                            console.log(log2);
-                            console.log(log3);
-                            console.log(log4);
+                            // console.log(log1);
+                            // console.log(log2);
+                            // console.log(log3);
+                            // console.log(log4);
 
 
                             var newLog = new Log({date: Date().Now, j_date: now, log1, log2, log3, log4, title});
                             newLog.save().then(log => {
-                                console.log('log saved :)');
+                                // console.log('log saved :)');
+                                res.redirect(`/dashboard/log-view?logID=${newLog._id}`);
                             }).catch(err => {if(err) console.log(err);});
                             
-                            res.redirect(`/dashboard/log-view?logID=${newLog._id}`);
                         });
                     });
                 });
             });
-            
-            
-            
-            
-
         }).catch(err => {if(err) console.log(err);});
         
         // var startDate = { day, month, year };

@@ -29,7 +29,7 @@ block content
                     td #{commutes[i].j_date.year}/#{commutes[i].j_date.month}/#{commutes[i].j_date.day}
                     td #{commutes[i].time.hour}:#{commutes[i].time.minute}:#{commutes[i].time.second}
                     td 
-                        -if(commutes[i].deviceID%2 == 0)
+                        -if(commutes[i].Enter)
                             .green ورود
                         -else 
                             .red خروج

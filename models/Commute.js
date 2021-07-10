@@ -8,6 +8,7 @@ var CommuteSchema = new mongoose.Schema({
   deviceID: Number,
   Enter: Boolean,
   accepted: Boolean,
+  logID: String,
 });
 
 var Commute = mongoose.model('Commute', CommuteSchema);
