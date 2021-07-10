@@ -54,9 +54,9 @@ block content
                 -}
                 -var start = {hour: 0, minute: 0, second: 0}, end = {hour: 0, minute: 0, second: 0};
                 -for(var j=0; j<monthData[i].commutes.length; j++)
-                    -if(monthData[i].commutes[j].Enter) {start = monthData[i].commutes[j].time; break;}
+                    -if(monthData[i].commutes[j] != 'undefined' && monthData[i].commutes[j].Enter) {start = monthData[i].commutes[j].time; break;}
                 -for(var j=monthData[i].commutes.length-1; j>0; j--)
-                    -if(!monthData[i].commutes[j].Enter) {end = monthData[i].commutes[j].time; break;}
+                    -if(monthData[i].commutes[j] != 'undefined' && !monthData[i].commutes[j].Enter) {end = monthData[i].commutes[j].time; break;}
                 -var total = deltaTime(start, end);
                 -if((sum.hour * 60 * 60) + (sum.minute * 60) + (sum.second) != 0)
                     .sum-area 
