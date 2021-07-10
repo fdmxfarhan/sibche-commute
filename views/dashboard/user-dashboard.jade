@@ -12,19 +12,34 @@ block content
                 ul 
                     li به پنل کاربری خود خوش آمدید
         -}
-    h1.title #{get_persian_month(parseInt(now.month))} ماه #{now.year}
-        a.prev(href="/dashboard/commute-month?month=#{parseInt(now.month) - 1}") 
-            i.fa.fa-chevron-right
-            | #{get_persian_month(parseInt(now.month)-1)}
-        a.next(href="/dashboard/commute-month?month=#{parseInt(now.month) + 1}") 
-            | #{get_persian_month(parseInt(now.month)+1)}
-            i.fa.fa-chevron-left
+    h1.title #{get_persian_month(parseInt(month))} ماه #{now.year}
+        -if(user.role == 'admin'){
+            .gray.inline.small (پرسنل شماره #{personelID})
+            a.prev(href="/dashboard/admin-view-user?month=#{parseInt(month) - 1}&personelID=#{personelID}") 
+                i.fa.fa-chevron-right
+                | #{get_persian_month(parseInt(month)-1)}
+            a.next(href="/dashboard/admin-view-user?month=#{parseInt(month) + 1}&personelID=#{personelID}") 
+                | #{get_persian_month(parseInt(month)+1)}
+                i.fa.fa-chevron-left
+        -}else{
+            a.prev(href="/dashboard/commute-month?month=#{parseInt(month) - 1}") 
+                i.fa.fa-chevron-right
+                | #{get_persian_month(parseInt(month)-1)}
+            a.next(href="/dashboard/commute-month?month=#{parseInt(month) + 1}") 
+                | #{get_persian_month(parseInt(month)+1)}
+                i.fa.fa-chevron-left
+        -}
     .commute-area
         -for(var i=0; i<thisMonth.length; i++){
-            .day-view(id="day#{i}") #{day_in_week(thisMonth[i].date)} #{thisMonth[i].day} #{get_persian_month(thisMonth[i].month)} ماه 
-                -var correct = 0, incorrect = 0;
+            .day-view(id="day#{i}" class="#{day_in_week(thisMonth[i].date) == 'جمعه' || day_in_week(thisMonth[i].date) == 'پنج شنبه' ? 'holiday': ''}")
+                | #{day_in_week(thisMonth[i].date)} #{thisMonth[i].day} #{get_persian_month(thisMonth[i].month)} ماه 
+                -var correct = 0, incorrect = 0, sum = {hour: 0, minute: 0, second: 0}, total = {hour: 0, minute: 0, second: 0};
                 -for(var j=0; j<thisMonth[i].commutes.length-1; j+=2){
-                    -if(thisMonth[i].commutes[j].Enter && !thisMonth[i].commutes[j+1].Enter ) correct++; 
+                    -if(thisMonth[i].commutes[j].Enter && !thisMonth[i].commutes[j+1].Enter ) {
+                        -correct++; 
+                        -sum = sumTime(sum, deltaTime(thisMonth[i].commutes[j].time, thisMonth[i].commutes[j+1].time))
+                        
+                    -}
                     -else if(!thisMonth[i].commutes[j].Enter)    {incorrect++;thisMonth[i].commutes.splice(j  , 0, 'undefined');}
                     -else if(thisMonth[i].commutes[j+1].Enter)   {incorrect++;thisMonth[i].commutes.splice(j+1, 0, 'undefined');}
                     -else incorrect++;
@@ -37,17 +52,33 @@ block content
                         .red.inline #{incorrect} تردد ناقص
                     | )
                 -}
+                -var start = {hour: 0, minute: 0, second: 0}, end = {hour: 0, minute: 0, second: 0};
+                -for(var j=0; j<thisMonth[i].commutes.length; j++)
+                    -if(thisMonth[i].commutes[j].Enter) {start = thisMonth[i].commutes[j].time; break;}
+                -for(var j=thisMonth[i].commutes.length-1; j>0; j--)
+                    -if(!thisMonth[i].commutes[j].Enter) {end = thisMonth[i].commutes[j].time; break;}
+                -total = deltaTime(start, end);
+                -if((sum.hour * 60 * 60) + (sum.minute * 60) + (sum.second) != 0)
+                    .sum-area 
+                        .sum(id="sum#{i}") #{total.hour}:#{total.minute} / #{sum.hour}:#{sum.minute}
+                        -percent = (((sum.hour * 60 * 60) + (sum.minute * 60) + (sum.second))/((total.hour * 60 * 60) + (total.minute * 60) + (total.second)))*100;
+                        script.
+                            $('#sum#{i}').css('width', '#{percent > 45 ? percent : 45}%');
+                    
                 i.fa.fa-chevron-down.chev
             .commute(id="commute#{i}")
                 table
                     tr 
                         th 
-                            i.fa.fa-pencil
+                            //- i.fa.fa-pencil
                         th شماره دستگاه ورود
                         th شماره دستگاه خروج
                         th زمان ورود
                         th زمان خروج
                         th وضعیت
+                        -if(user.role == 'admin')
+                            th 
+                                //- i.fa.fa-trash
                     -for(var j=0; j<thisMonth[i].commutes.length-1; j+=2){
                         -if(thisMonth[i].commutes[j+1] == 'undefined'){ 
                             tr 
@@ -61,6 +92,9 @@ block content
                                     .red -
                                 td 
                                     .red ناقص
+                                -if(user.role == 'admin')
+                                    td 
+                                        i.fa.fa-trash.delete
                         -}else if(thisMonth[i].commutes[j] == 'undefined'){ 
                             tr 
                                 td
@@ -73,6 +107,9 @@ block content
                                 td #{thisMonth[i].commutes[j+1].time.hour}:#{thisMonth[i].commutes[j+1].time.minute}:#{thisMonth[i].commutes[j+1].time.second}
                                 td 
                                     .red ناقص
+                                -if(user.role == 'admin')
+                                    td 
+                                        i.fa.fa-trash.delete
                         -}else if(thisMonth[i].commutes[j].Enter && !thisMonth[i].commutes[j+1].Enter ){
                             tr 
                                 td
@@ -83,6 +120,9 @@ block content
                                 td #{thisMonth[i].commutes[j+1].time.hour}:#{thisMonth[i].commutes[j+1].time.minute}:#{thisMonth[i].commutes[j+1].time.second}
                                 td 
                                     .green صحیح
+                                -if(user.role == 'admin')
+                                    td 
+                                        i.fa.fa-trash.delete
                         -}else{
                             tr 
                                 td
@@ -93,6 +133,9 @@ block content
                                 td #{thisMonth[i].commutes[j+1].time.hour}:#{thisMonth[i].commutes[j+1].time.minute}:#{thisMonth[i].commutes[j+1].time.second}
                                 td 
                                     .red خیلی ناقص
+                                -if(user.role == 'admin')
+                                    td 
+                                        i.fa.fa-trash.delete
                         -}
                     -}
         -}

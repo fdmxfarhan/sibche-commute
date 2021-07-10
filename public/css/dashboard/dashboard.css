@@ -1,7 +1,9 @@
 .green{color: rgb(0, 252, 0);}
+.gray{color: rgb(100, 100, 100);}
 .dark-green{color: rgb(10, 168, 10);}
 .red{color: red;}
 .inline{display: inline;}
+.small{font-weight: normal;font-size: 1.3vw;padding: 0 0.3vw;}
 @media only screen and (min-width: 800px) {
     .graph-cards-area{
         overflow: hidden;
@@ -165,13 +167,19 @@
         padding-right: 0.3vw;
         font-size: 1vw;
     }
+    .commute-area table td i.delete{
+        color: rgb(255, 38, 0);
+        cursor: pointer;
+        font-size: 1.2vw;
+        transition-duration: 500ms;
+    }
     .commute-area table td i.edit{
         color: var(--blue);
         cursor: pointer;
         font-size: 1.2vw;
         transition-duration: 500ms;
     }
-    .commute-area table td i.edit:hover{
+    .commute-area table td i:hover{
         color: chocolate;
     }
     .day-view:hover{background-color: salmon;}
@@ -417,8 +425,34 @@
         background-color: salmon;
     }
 
-
-
+    .day-view .sum{
+        /* position: absolute;
+        top: 0.8vw;
+        left: 6vw; */
+        font-size: 0.9vw;
+        background-color: rgb(0, 119, 255);
+        border-radius: 0.8vw;
+        padding: 0;
+        /* width: 5vw; */
+        text-align: center;
+        color: white;
+        float: left;
+    }
+    .day-view .sum-area{
+        position: absolute;
+        top: 0.8vw;
+        left: 6vw;
+        background-color: rgb(167, 182, 199);
+        border-radius: 0.8vw;
+        padding: 0;
+        width: 13vw;
+        height: 1.5vw;
+        text-align: left;
+        color: white;
+    }
+    .day-view.holiday{
+        background-color: rgb(208, 233, 232);
+    }
 }
 @media only screen and (max-width: 800px) {
     

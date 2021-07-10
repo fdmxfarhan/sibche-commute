@@ -48,6 +48,27 @@ var sortAlgorithm = (a, b) => {
     return a.j_date.year - b.j_date.year;
 }
 
+var deltaTime = (time1, time2) => {
+    sec1 = (time1.hour * 60 * 60) + (time1.minute * 60) + (time1.second);
+    sec2 = (time2.hour * 60 * 60) + (time2.minute * 60) + (time2.second);
+    result = Math.abs(sec1 - sec2);
+    hour = Math.floor(result/3600);
+    minute = Math.floor((result%3600) / 60);
+    second = result - (hour*3600 + minute*60)
+    return {hour, minute, second};
+}
+
+var sumTime = (time1, time2) => {
+    sec1 = (time1.hour * 60 * 60) + (time1.minute * 60) + (time1.second);
+    sec2 = (time2.hour * 60 * 60) + (time2.minute * 60) + (time2.second);
+    result = Math.abs(sec1 + sec2);
+    hour = Math.floor(result/3600);
+    minute = Math.floor((result%3600) / 60);
+    second = result - (hour*3600 + minute*60)
+    return {hour, minute, second};
+}
+
+
 router.get('/', ensureAuthenticated, (req, res, next) => {
     greg = new Date(Date.now());
     day = greg.getDate();
@@ -83,6 +104,9 @@ router.get('/', ensureAuthenticated, (req, res, next) => {
                 get_persian_month: dateConvert.get_persian_month,
                 day_in_week: dateConvert.day_in_week,
                 j_days_in_month: dateConvert.j_days_in_month,
+                month: now.month,
+                deltaTime,
+                sumTime,
             });
         });
     }
@@ -202,13 +226,47 @@ router.get('/accept-log', ensureAuthenticated, (req, res, next) => {
 
 router.get('/admin-view-user', ensureAuthenticated, (req, res, next) => {
     if(req.user.role == 'admin'){
+        greg = new Date(Date.now());
+        day = greg.getDate();
+        month = greg.getMonth() + 1;
+        year = greg.getFullYear();
+        jalali = dateConvert.gregorian_to_jalali(year, month, day);
+        var now = { year: jalali[0], month: jalali[1], day: jalali[2], date: greg};
+        var monthNum = now.month;
+        if(req.query.month) monthNum = req.query.month;
         Commute.find({personelID: req.query.personelID}, (err, commutes) => {
             commutes.sort(sortAlgorithm);
-            res.render('./dashboard/admin-view-user', {
+            var monthData = [];
+            for(var i=0; i<dateConvert.j_days_in_month[monthNum-1]; i++){
+                var j_year = now.year;
+                var j_month = monthNum;
+                var j_day = i+1;
+                var j_date = dateConvert.jalali_to_gregorian(j_year, j_month, j_day);
+                var j_d = new Date(j_date[0], j_date[1]-1, j_date[2], 12, 0, 0, 0);
+                var thisCommutes = [];
+                for (let j = 0; j < commutes.length; j++) {
+                    if(commutes[j].j_date.year == j_year && commutes[j].j_date.month == j_month && commutes[j].j_date.day == j_day)
+                        thisCommutes.push(commutes[j]);
+                }
+                monthData.push({year: j_year, month: j_month, day: j_day, date: j_d, commutes: thisCommutes});
+            }
+            res.render('./dashboard/commute-month', {
                 user: req.user,
-                commutes,
+                now,
+                monthData,
+                get_persian_month: dateConvert.get_persian_month,
+                day_in_week: dateConvert.day_in_week,
+                j_days_in_month: dateConvert.j_days_in_month,
+                month: monthNum,
+                deltaTime,
+                sumTime,
                 personelID: req.query.personelID,
             });
+            // res.render('./dashboard/admin-view-user', {
+            //     user: req.user,
+            //     commutes,
+            //     personelID: req.query.personelID,
+            // });
         });
     }
 });
@@ -247,6 +305,8 @@ router.get('/commute-month', ensureAuthenticated, (req, res, next) => {
             day_in_week: dateConvert.day_in_week,
             j_days_in_month: dateConvert.j_days_in_month,
             month: monthNum,
+            deltaTime,
+            sumTime,
         });
     });
 });
