@@ -11,10 +11,29 @@ $(document).ready(function(){
     for(var i=0; i<100; i++){
         commutes.push({btn: $(`#day${i}`), commute: $(`#commute${i}`)});
     }
+    var edits = [];
+    for(var i=0; i<5000; i++){
+        for(var j=0; j<200; j++){
+            edits.push({btn: $(`#btn-edit${i}-form${j}`), edit: $(`#day${i}-form${j}`)});
+        }
+    }
+    
     commutes.forEach(commute => {
         commute.btn.click(() => {
             // modal.fadeIn(500);
+            edits.forEach(edit => {
+                edit.edit.hide();
+            });
             commute.commute.slideToggle(500);
+        });
+    });
+    
+    edits.forEach(edit => {
+        edit.btn.click(() => {
+            edits.forEach(edit => {
+                edit.edit.hide();
+            });
+            edit.edit.slideToggle(500);
         });
     });
 

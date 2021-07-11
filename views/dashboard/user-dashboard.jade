@@ -54,10 +54,10 @@ block content
                 -}
                 -var start = {hour: 0, minute: 0, second: 0}, end = {hour: 0, minute: 0, second: 0};
                 -for(var j=0; j<thisMonth[i].commutes.length; j++)
-                    -if(thisMonth[i].commutes[j].Enter) {start = thisMonth[i].commutes[j].time; break;}
+                    -if(thisMonth[i].commutes[j] != 'undefined' && thisMonth[i].commutes[j].Enter) {start = thisMonth[i].commutes[j].time; break;}
                 -for(var j=thisMonth[i].commutes.length-1; j>0; j--)
-                    -if(!thisMonth[i].commutes[j].Enter) {end = thisMonth[i].commutes[j].time; break;}
-                -total = deltaTime(start, end);
+                    -if(thisMonth[i].commutes[j] != 'undefined' && !thisMonth[i].commutes[j].Enter) {end = thisMonth[i].commutes[j].time; break;}
+                -var total = deltaTime(start, end);
                 -if((sum.hour * 60 * 60) + (sum.minute * 60) + (sum.second) != 0)
                     .sum-area 
                         .sum(id="sum#{i}") #{total.hour}:#{total.minute} / #{sum.hour}:#{sum.minute}
@@ -83,7 +83,7 @@ block content
                         -if(thisMonth[i].commutes[j+1] == 'undefined'){ 
                             tr 
                                 td
-                                    i.fa.fa-edit.edit
+                                    i.fa.fa-edit.edit(id="btn-edit#{i}-form#{j}")
                                 td= thisMonth[i].commutes[j].deviceID
                                 td 
                                     .red -
@@ -94,11 +94,12 @@ block content
                                     .red ناقص
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=#{thisMonth[i].commutes[j]._id}&id2=undefined&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}else if(thisMonth[i].commutes[j] == 'undefined'){ 
                             tr 
                                 td
-                                    i.fa.fa-edit.edit
+                                    i.fa.fa-edit.edit(id="btn-edit#{i}-form#{j}")
                                 td 
                                     .red -
                                 td= thisMonth[i].commutes[j+1].deviceID
@@ -109,11 +110,12 @@ block content
                                     .red ناقص
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=undefined&id2=#{thisMonth[i].commutes[j+1]._id}&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}else if(thisMonth[i].commutes[j].Enter && !thisMonth[i].commutes[j+1].Enter ){
                             tr 
                                 td
-                                    i.fa.fa-edit.edit
+                                    i.fa.fa-edit.edit(id="btn-edit#{i}-form#{j}")
                                 td= thisMonth[i].commutes[j].deviceID
                                 td= thisMonth[i].commutes[j+1].deviceID
                                 td #{thisMonth[i].commutes[j].time.hour}:#{thisMonth[i].commutes[j].time.minute}:#{thisMonth[i].commutes[j].time.second}
@@ -122,11 +124,12 @@ block content
                                     .green صحیح
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=#{thisMonth[i].commutes[j]._id}&id2=#{thisMonth[i].commutes[j+1]._id}&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}else{
                             tr 
                                 td
-                                    i.fa.fa-edit.edit
+                                    i.fa.fa-edit.edit(id="btn-edit#{i}-form#{j}")
                                 td= thisMonth[i].commutes[j].deviceID
                                 td= thisMonth[i].commutes[j+1].deviceID
                                 td #{thisMonth[i].commutes[j].time.hour}:#{thisMonth[i].commutes[j].time.minute}:#{thisMonth[i].commutes[j].time.second}
@@ -135,8 +138,147 @@ block content
                                     .red خیلی ناقص
                                 -if(user.role == 'admin')
                                     td 
-                                        i.fa.fa-trash.delete
+                                        a(href="/dashboard/remove-commute?id1=undefined&id2=undefined&personelID=#{personelID}&month=#{month}") 
+                                            i.fa.fa-trash.delete
                         -}
                     -}
+            -if(user.role == 'admin'){
+                .edit-commute 
+                    -for(var j=0; j<thisMonth[i].commutes.length-1; j+=2){
+                        -if(thisMonth[i].commutes[j+1] == 'undefined'){ 
+                            form(action="/dashboard/edit-commute" method="POST" id="day#{i}-form#{j}") 
+                                input.hidden(type="text" name="month" value="#{month}")
+                                input.hidden(type="text" name="personelID" value="#{personelID}")
+                                input.hidden(type="text" name="enterCommuteID" value="#{thisMonth[i].commutes[j]._id}")
+                                input.hidden(type="text" name="exitCommuteID" value="undefined")
+                                input.hidden(type="number" name="Dday" value="#{thisMonth[i].commutes[j].j_date.day}")
+                                input.hidden(type="number" name="Dmonth" value="#{thisMonth[i].commutes[j].j_date.month}")
+                                input.hidden(type="number" name="Dyear" value="#{thisMonth[i].commutes[j].j_date.year}")
+                                input.hidden(type="text" name="date" value="#{thisMonth[i].commutes[j].date}")
+
+                                input.device(type="number" name="enterDeviceID" placeholder="شماره دستگاه ورود" value="#{thisMonth[i].commutes[j].deviceID}")
+                                input.device(type="number" name="exitDeviceID" placeholder="شماره دستگاه خروج" value="1")
+                                .time
+                                    input.min(type="number" name="enterMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j].time.minute}")
+                                    | :
+                                    input.hour(type="number" name="enterHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j].time.hour}")
+                                .time
+                                    input.min(type="number" name="exitMinute" placeholder="دقیقه" value="0")
+                                    | :
+                                    input.hour(type="number" name="exitHour" placeholder="ساعت" value="0")
+                                input.submit(type="submit" value="ثبت")
+                        -}else if(thisMonth[i].commutes[j] == 'undefined'){ 
+                            form(action="/dashboard/edit-commute" method="POST" id="day#{i}-form#{j}") 
+                                input.hidden(type="text" name="month" value="#{month}")
+                                input.hidden(type="text" name="personelID" value="#{personelID}")
+                                input.hidden(type="text" name="enterCommuteID" value="undefined")
+                                input.hidden(type="text" name="exitCommuteID" value="#{thisMonth[i].commutes[j+1]._id}")
+                                input.hidden(type="number" name="Dday" value="#{thisMonth[i].commutes[j+1].j_date.day}")
+                                input.hidden(type="number" name="Dmonth" value="#{thisMonth[i].commutes[j+1].j_date.month}")
+                                input.hidden(type="number" name="Dyear" value="#{thisMonth[i].commutes[j+1].j_date.year}")
+                                input.hidden(type="text" name="date" value="#{thisMonth[i].commutes[j+1].date}")
+
+                                input.device(type="number" name="enterDeviceID" placeholder="شماره دستگاه ورود" value="2")
+                                input.device(type="number" name="exitDeviceID" placeholder="شماره دستگاه خروج" value="#{thisMonth[i].commutes[j+1].deviceID}")
+                                .time
+                                    input.min(type="number" name="enterMinute" placeholder="دقیقه" value="0")
+                                    | :
+                                    input.hour(type="number" name="enterHour" placeholder="ساعت" value="0")
+                                .time
+                                    input.min(type="number" name="exitMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j+1].time.minute}")
+                                    | :
+                                    input.hour(type="number" name="exitHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j+1].time.hour}")
+                                input.submit(type="submit" value="ثبت")
+                        -}else if(thisMonth[i].commutes[j].Enter && !thisMonth[i].commutes[j+1].Enter ){
+                            form(action="/dashboard/edit-commute" method="POST" id="day#{i}-form#{j}") 
+                                input.hidden(type="text" name="month" value="#{month}")
+                                input.hidden(type="text" name="personelID" value="#{personelID}")
+                                input.hidden(type="text" name="enterCommuteID" value="#{thisMonth[i].commutes[j]._id}")
+                                input.hidden(type="text" name="exitCommuteID" value="#{thisMonth[i].commutes[j+1]._id}")
+                                input.hidden(type="number" name="Dday" value="#{thisMonth[i].commutes[j].j_date.day}")
+                                input.hidden(type="number" name="Dmonth" value="#{thisMonth[i].commutes[j].j_date.month}")
+                                input.hidden(type="number" name="Dyear" value="#{thisMonth[i].commutes[j].j_date.year}")
+                                input.hidden(type="text" name="date" value="#{thisMonth[i].commutes[j].date}")
+
+                                input.device(type="number" name="enterDeviceID" placeholder="شماره دستگاه ورود" value="#{thisMonth[i].commutes[j].deviceID}")
+                                input.device(type="number" name="exitDeviceID" placeholder="شماره دستگاه خروج" value="#{thisMonth[i].commutes[j+1].deviceID}")
+                                .time
+                                    input.min(type="number" name="enterMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j].time.minute}")
+                                    | :
+                                    input.hour(type="number" name="enterHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j].time.hour}")
+                                .time
+                                    input.min(type="number" name="exitMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j+1].time.minute}")
+                                    | :
+                                    input.hour(type="number" name="exitHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j+1].time.hour}")
+                                input.submit(type="submit" value="ثبت")
+                        -}
+                    -}
+            -}else{
+                .edit-commute 
+                    -for(var j=0; j<thisMonth[i].commutes.length-1; j+=2){
+                        -if(thisMonth[i].commutes[j+1] == 'undefined'){ 
+                            form(action="/dashboard/edit-commute" method="POST" id="day#{i}-form#{j}") 
+                                input.hidden(type="text" name="month" value="#{month}")
+                                input.hidden(type="text" name="personelID" value="#{personelID}")
+                                input.hidden(type="text" name="enterCommuteID" value="#{thisMonth[i].commutes[j]._id}")
+                                input.hidden(type="text" name="exitCommuteID" value="undefined")
+                                input.hidden(type="number" name="Dday" value="#{thisMonth[i].commutes[j].j_date.day}")
+                                input.hidden(type="number" name="Dmonth" value="#{thisMonth[i].commutes[j].j_date.month}")
+                                input.hidden(type="number" name="Dyear" value="#{thisMonth[i].commutes[j].j_date.year}")
+                                input.hidden(type="text" name="date" value="#{thisMonth[i].commutes[j].date}")
+
+                                input.device(type="number" name="enterDeviceID" placeholder="شماره دستگاه ورود" value="#{thisMonth[i].commutes[j].deviceID}" readonly )
+                                input.device(type="number" name="exitDeviceID" placeholder="شماره دستگاه خروج" value="1")
+                                .time
+                                    input.min(type="number" name="enterMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j].time.minute}" readonly )
+                                    | :
+                                    input.hour(type="number" name="enterHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j].time.hour}" readonly )
+                                .time
+                                    input.min(type="number" name="exitMinute" placeholder="دقیقه" value="0")
+                                    | :
+                                    input.hour(type="number" name="exitHour" placeholder="ساعت" value="0")
+                                input.submit(type="submit" value="ثبت")
+                        -}else if(thisMonth[i].commutes[j] == 'undefined'){ 
+                            form(action="/dashboard/edit-commute" method="POST" id="day#{i}-form#{j}") 
+                                input.hidden(type="text" name="month" value="#{month}")
+                                input.hidden(type="text" name="personelID" value="#{personelID}")
+                                input.hidden(type="text" name="enterCommuteID" value="undefined")
+                                input.hidden(type="text" name="exitCommuteID" value="#{thisMonth[i].commutes[j+1]._id}")
+                                input.hidden(type="number" name="Dday" value="#{thisMonth[i].commutes[j+1].j_date.day}")
+                                input.hidden(type="number" name="Dmonth" value="#{thisMonth[i].commutes[j+1].j_date.month}")
+                                input.hidden(type="number" name="Dyear" value="#{thisMonth[i].commutes[j+1].j_date.year}")
+                                input.hidden(type="text" name="date" value="#{thisMonth[i].commutes[j+1].date}")
+
+                                input.device(type="number" name="enterDeviceID" placeholder="شماره دستگاه ورود" value="2")
+                                input.device(type="number" name="exitDeviceID" placeholder="شماره دستگاه خروج" value="#{thisMonth[i].commutes[j+1].deviceID}" readonly )
+                                .time
+                                    input.min(type="number" name="enterMinute" placeholder="دقیقه" value="0")
+                                    | :
+                                    input.hour(type="number" name="enterHour" placeholder="ساعت" value="0")
+                                .time
+                                    input.min(type="number" name="exitMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j+1].time.minute}" readonly )
+                                    | :
+                                    input.hour(type="number" name="exitHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j+1].time.hour}" readonly )
+                                input.submit(type="submit" value="ثبت")
+                        -}else if(thisMonth[i].commutes[j].Enter && !thisMonth[i].commutes[j+1].Enter ){
+                            //- form(action="/dashboard/edit-commute" method="POST" id="day#{i}-form#{j}") 
+                            //-     input.hidden(type="text" name="enterCommuteID" value="#{thisMonth[i].commutes[j]._id}" readonly )
+                            //-     input.hidden(type="text" name="exitCommuteID" value="#{thisMonth[i].commutes[j+1]._id}" readonly )
+                                
+                            //-     input.device(type="number" name="enterDeviceID" placeholder="شماره دستگاه ورود" value="#{thisMonth[i].commutes[j].deviceID}" readonly )
+                            //-     input.device(type="number" name="exitDeviceID" placeholder="شماره دستگاه خروج" value="#{thisMonth[i].commutes[j+1].deviceID}" readonly )
+                            //-     .time
+                            //-         input.min(type="number" name="enterMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j].time.minute}" readonly )
+                            //-         | :
+                            //-         input.hour(type="number" name="enterHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j].time.hour}" readonly )
+                            //-     .time
+                            //-         input.min(type="number" name="exitMinute" placeholder="دقیقه" value="#{thisMonth[i].commutes[j+1].time.minute}" readonly )
+                            //-         | :
+                            //-         input.hour(type="number" name="exitHour" placeholder="ساعت" value="#{thisMonth[i].commutes[j+1].time.hour}" readonly )
+                            //-     input.submit(type="submit" value="ثبت")
+                        -}
+                    -}
+            -}
+            
         -}
     script(src="/js/dashboard.js") 

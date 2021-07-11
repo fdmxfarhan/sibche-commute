@@ -10,6 +10,7 @@ const dateConvert = require('../config/dateConvert');
 const Log = require('../models/Log');
 const Commute = require('../models/Commute');
 const bcrypt = require('bcryptjs');
+var excel = require('excel4node');
 
 // async function main(){
 
@@ -68,6 +69,18 @@ var sumTime = (time1, time2) => {
     return {hour, minute, second};
 }
 
+var getSec = (time) => {
+    return((time.hour * 60 * 60) + (time.minute * 60) + (time.second));
+}
+
+var getNow = () => {
+    greg = new Date(Date.now());
+    day = greg.getDate();
+    month = greg.getMonth() + 1;
+    year = greg.getFullYear();
+    jalali = dateConvert.gregorian_to_jalali(year, month, day);
+    return({ year: jalali[0], month: jalali[1], day: jalali[2], date: greg});
+}
 
 router.get('/', ensureAuthenticated, (req, res, next) => {
     greg = new Date(Date.now());
@@ -107,6 +120,7 @@ router.get('/', ensureAuthenticated, (req, res, next) => {
                 month: now.month,
                 deltaTime,
                 sumTime,
+                personelID: req.user.idNumber,
             });
         });
     }
@@ -332,6 +346,190 @@ router.get('/remove-commute', ensureAuthenticated, (req, res, next) => {
             Commute.deleteOne({_id: req.query.id2}, err => {
                 res.redirect(`/dashboard/admin-view-user?personelID=${req.query.personelID}&month=${req.query.month}`)
             });
+        });
+    }
+});
+
+router.post('/edit-commute', ensureAuthenticated, (req, res, next) => {
+    var {date, Dday, Dmonth, Dyear, month, personelID, enterCommuteID, exitCommuteID, enterDeviceID, exitDeviceID, enterMinute, enterHour, exitMinute, exitHour} = req.body;
+    var accepted = false;
+    if(req.user.role == 'admin') accepted = true;
+    var role = req.user.role;
+    if (role == 'user') personelID = req.user.idNumber;
+    if(exitCommuteID == 'undefined'){
+        enterTime = {hour: enterHour, minute: enterMinute, second: 0};
+        exitTime = {hour: exitHour, minute: exitMinute, second: 0};
+        Commute.updateMany({_id: enterCommuteID}, {$set: {time: enterTime, deviceID: enterDeviceID}}, (err, doc) => {
+            var newCommute = new Commute({
+                personelID,
+                // date: new Date(date),
+                j_date: {day: Dday, month: Dmonth, year: Dyear, date},
+                time: exitTime,
+                deviceID: exitDeviceID,
+                Enter: false,
+                logID: 'edit',
+                accepted,
+            });
+            newCommute.save().then(doc => {
+                if(role == 'admin') res.redirect(`/dashboard/admin-view-user?personelID=${personelID}&month=${month}`)
+                else                res.redirect(`/dashboard/commute-month?personelID=${personelID}&month=${month}`)
+            }).catch(err => {if(err) console.log(err);});
+        });
+    }else if(enterCommuteID == 'undefined'){
+        enterTime = {hour: enterHour, minute: enterMinute, second: 0};
+        exitTime = {hour: exitHour, minute: exitMinute, second: 0};
+        Commute.updateMany({_id: exitCommuteID}, {$set: {time: exitTime, deviceID: exitDeviceID}}, (err, doc) => {
+            var newCommute = new Commute({
+                personelID,
+                // date: new Date(date),
+                j_date: {day: Dday, month: Dmonth, year: Dyear, date: date},
+                time: enterTime,
+                deviceID: enterDeviceID,
+                Enter: true,
+                logID: 'edit',
+                accepted,
+            });
+            newCommute.save().then(doc => {
+                if(role == 'admin') res.redirect(`/dashboard/admin-view-user?personelID=${personelID}&month=${month}`)
+                else                res.redirect(`/dashboard/commute-month?personelID=${personelID}&month=${month}`)
+            }).catch(err => {if(err) console.log(err);});
+        });
+    }else{
+        enterTime = {hour: enterHour, minute: enterMinute, second: 0};
+        exitTime = {hour: exitHour, minute: exitMinute, second: 0};
+        Commute.updateMany({_id: enterCommuteID}, {$set: {time: enterTime, deviceID: enterDeviceID}}, (err, doc) => {
+            if(err) console.log(err);
+            Commute.updateMany({_id: exitCommuteID}, {$set: {time: exitTime, deviceID: exitDeviceID}}, (err, doc) => {
+                if(err) console.log(err);
+                if(role == 'admin') res.redirect(`/dashboard/admin-view-user?personelID=${personelID}&month=${month}`)
+                else                res.redirect(`/dashboard/commute-month?personelID=${personelID}&month=${month}`)
+            });
+        });
+    }
+});
+
+router.get('/delete-incorrect-commutes', ensureAuthenticated, (req, res, next) => {
+    var {personelID, month} = req.query;
+    Commute.find({personelID: req.query.personelID}, (err, commutes) => {
+        commutes.sort(sortAlgorithm);
+        deleteCommutesID = [];
+        for (let i = 0; i < commutes.length; i++) {
+            if(commutes[i].j_date.month != req.query.month)
+                commutes.splice(i, 1);
+        }
+        for(var j=0; j<commutes.length-1; j+=2){
+            if(commutes[j].Enter && !commutes[j+1].Enter ) {
+                
+            }
+            else if(!commutes[j].Enter){
+                if(commutes[j-1] && commutes[j-1] != 'undefined')
+                {
+                    if(getSec(deltaTime(commutes[j].time, commutes[j-1].time)) < 60 && commutes[j].deviceID == commutes[j-1].deviceID)
+                        deleteCommutesID.push(commutes[j]._id);
+                }
+                if(commutes[j+1] && commutes[j+1] != 'undefined')
+                {    
+                    if(getSec(deltaTime(commutes[j].time, commutes[j+1].time)) < 60 && commutes[j].deviceID == commutes[j+1].deviceID)
+                        deleteCommutesID.push(commutes[j]._id);
+                }
+                commutes.splice(j  , 0, 'undefined');
+            }
+            else if(commutes[j+1].Enter){
+                if(commutes[j+1] && commutes[j+1] != 'undefined')
+                {
+                    if(getSec(deltaTime(commutes[j].time, commutes[j+1].time)) < 60 && commutes[j].deviceID == commutes[j+1].deviceID)
+                        deleteCommutesID.push(commutes[j]._id);
+                }
+                if(commutes[j-1] && commutes[j-1] != 'undefined')
+                {
+                    if(getSec(deltaTime(commutes[j].time, commutes[j-1].time)) < 60 && commutes[j].deviceID == commutes[j-1].deviceID)
+                        deleteCommutesID.push(commutes[j]._id);
+                }
+                commutes.splice(j+1, 0, 'undefined');
+            }
+        }
+        deleteCommutesID.forEach(del => {
+            Commute.deleteOne({_id: del}, (err) => {
+                console.log('deleted ' + del);
+            });
+        });
+        if(req.user.role == 'admin') 
+            res.redirect(`/dashboard/admin-view-user?personelID=${personelID}&month=${month}`)
+        else                
+            res.redirect(`/dashboard/commute-month?personelID=${personelID}&month=${month}`)
+    });
+});
+
+router.get('/report', ensureAuthenticated, (req, res, next) => {
+    if(req.user.role = 'admin')
+    {
+        Commute.find({}, (err, commutes) => {
+            users = [];
+            for (let i = 0; i < commutes.length; i++) {
+                if(users.indexOf(commutes[i].personelID) == -1)
+                    users.push(commutes[i].personelID);
+            }
+            users.sort(function(a, b){return a-b});
+            commutes.sort(sortAlgorithm);
+            var usersTime = [];
+            for (let i = 0; i < users.length; i++) {
+                sum = {hour: 0, minute: 0, second: 0}
+                // for(var j=0; j<commutes.length-1; j+=2){
+                //     if(commutes[j].personelID == users[i] && commutes[j+1].personelID == users[i]){
+                //         if(commutes[j].Enter && !commutes[j+1].Enter ) {
+                //             sum = sumTime(sum, deltaTime(commutes[j].time, commutes[j+1].time))
+                //         }
+                //         else if(!commutes[j].Enter)   
+                //             commutes.splice(j  , 0, 'undefined');
+                //         else if(commutes[j+1].Enter)  
+                //             commutes.splice(j+1, 0, 'undefined');
+                //     }
+                // }
+                usersTime.push(sum);
+            }
+            // console.log(usersTime);
+            res.render('./dashboard/admin-report', {
+                user: req.user,
+                login: req.query.login,
+                users,
+                usersTime,
+            });
+        });
+    }
+});
+
+router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
+    var style = workbook.createStyle({
+        font: {
+        color: '#000000',
+        size: 12
+        },
+        numberFormat: '$#,##0.00; ($#,##0.00); -'
+    });
+    now = getNow();
+    if(req.user.role == 'admin')
+    {
+        Commute.find({personelID: req.query.personelID}, (err, commutes) => {
+            commutes.sort(sortAlgorithm);
+            monthData = [];
+            for(var i=0; i<12; i++){
+                var workbook = new excel.Workbook();
+                var worksheet = workbook.addWorksheet(convertDate.get_persian_month(i+1) + ' ' + now.year);
+                for (let j = 0; j < commutes.length; j++) {
+                    if(commutes[j].j_date.year == now.year && commutes[j].j_date.month == i+1)
+                    {
+                        worksheet.cell(1,1).string(`ردیف`).style(style);
+                        worksheet.cell(1,2).string(`دستگاه ورود`).style(style);
+                        worksheet.cell(1,3).string(`دستگاه خروج`).style(style);
+                        worksheet.cell(1,4).string(`affiliation`).style(style);
+                        worksheet.cell(1,5).string(`member1`).style(style);
+                        worksheet.cell(1,6).string(`member2`).style(style);
+                        worksheet.cell(1,7).string(`member3`).style(style);
+                        worksheet.cell(1,8).string(`member4`).style(style);
+                        worksheet.cell(1,9).string(`member5`).style(style);
+                    }
+                }
+            }
         });
     }
 });

@@ -1,0 +1,31 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li به پنل مدیریت خوش آمدید
+        -}
+    h1.title.center گزارشات
+
+    .cards-area
+        -for(var i=0; i<users.length; i++){
+            a(href="/dashboard/admin-report-user?personelID=#{users[i]}") 
+                .personel-card
+                    img(src="/img/avatar/2.png", alt="avatar")
+                    h1.name پرسنل شماره #{users[i]}
+                    //- h2.name -
+                    .time #{usersTime[i].hour}:#{usersTime[i].minute}:#{usersTime[i].second}
+        -}
+    
+    include upload-log-popup
+    
+    script(src="/js/dashboard.js") 
+
+

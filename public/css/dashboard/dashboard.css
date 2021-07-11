@@ -463,7 +463,81 @@
     a.clear-data i{
         padding-left: 0.4vw;
     }
-
+    .edit-commute form{
+        display: none;
+        margin-bottom: 1vw;
+    }
+    .edit-commute form input.device{
+        margin-right: 11.5vw;
+        border: none;
+        width: 4vw;
+        /* margin: 0 1vw; */
+        text-align: center;
+        padding: 0.4vw 1vw;
+        border-radius: 1vw;
+        font-family: 'iransans';
+        font-size: 1vw;
+    }
+    .edit-commute form input:focus{
+        outline: none;
+    }
+    .edit-commute form .time{
+        display: inline;
+        background-color: white;
+        margin-right: 6vw;
+        border: none;
+        width: 4vw;
+        /* margin: 0 1vw; */
+        text-align: center;
+        border-radius: 1vw;
+        font-family: 'iransans';
+        font-size: 1vw;
+        padding: 0.4vw 1vw;
+    }
+    .edit-commute form .time input{
+        width: 1.5vw;
+        padding: 0.1vw 0.1vw;
+        border: none;
+        font-size: 1.1vw;
+        background-color: transparent;
+        margin: 0;
+    }
+    .edit-commute form .time input:focus{
+        border-bottom: var(--blue) 0.1vw solid;
+    }
+    .edit-commute form .time input.min{text-align: left;}
+    .edit-commute form .time input.hour{text-align: right;}
+    .edit-commute form .time input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .edit-commute form input.submit{
+        display: inline;
+        margin: 0;
+        padding: 0.3vw 2vw;
+        font-size: 1.1vw;
+        border-radius: 1vw;
+        margin-right: 1vw;
+    }
+    .delete-incorrect-commutes{
+        text-align: left;
+        color: red;
+        width: 85%;
+        margin: auto;
+        margin-bottom: 0.5vw;
+    }
+    .delete-incorrect-commutes a{
+        color: red;
+        text-decoration: none;
+        font-family: 'iransans';
+        font-size: 1vw;
+    }
+    .delete-incorrect-commutes a i{
+        padding-left: 0.3vw;
+    }
+    .delete-incorrect-commutes a:hover{
+        color: orange;
+    }
 }
 @media only screen and (max-width: 800px) {
     
