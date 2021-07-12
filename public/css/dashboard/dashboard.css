@@ -538,7 +538,26 @@
     .delete-incorrect-commutes a:hover{
         color: orange;
     }
+    .report-area{
+        width: 90%;
+        margin: auto;
+    }
+    .report-area table td a{
+        text-decoration: none;
+        font-family: 'iransans';
+        font-size: 1.1vw;
+        color: var(--blue);
+    }
+    .report-area table td a i{
+        font-size: 1.2vw;
+        /* color: var(--blue); */
+        padding: 0 0.3vw;
+    }
+    .report-area table td a:hover{
+        color: salmon;
+    }
 }
+
 @media only screen and (max-width: 800px) {
     
 }

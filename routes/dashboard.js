@@ -5,6 +5,7 @@ const { now } = require('mongoose');
 const User = require('../models/User');
 const mail = require('../config/mail');
 const fs = require('fs');
+const path = require('path');
 const {unrar, list} = require('unrar-promise');
 const dateConvert = require('../config/dateConvert');
 const Log = require('../models/Log');
@@ -499,37 +500,142 @@ router.get('/report', ensureAuthenticated, (req, res, next) => {
 });
 
 router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
-    var style = workbook.createStyle({
-        font: {
-        color: '#000000',
-        size: 12
-        },
-        numberFormat: '$#,##0.00; ($#,##0.00); -'
-    });
-    now = getNow();
+    var now = getNow();
     if(req.user.role == 'admin')
     {
         Commute.find({personelID: req.query.personelID}, (err, commutes) => {
             commutes.sort(sortAlgorithm);
-            monthData = [];
-            for(var i=0; i<12; i++){
+            report = [];
+            for(var monthNum=1; monthNum<=12; monthNum++){
                 var workbook = new excel.Workbook();
-                var worksheet = workbook.addWorksheet(convertDate.get_persian_month(i+1) + ' ' + now.year);
-                for (let j = 0; j < commutes.length; j++) {
-                    if(commutes[j].j_date.year == now.year && commutes[j].j_date.month == i+1)
-                    {
-                        worksheet.cell(1,1).string(`ردیف`).style(style);
-                        worksheet.cell(1,2).string(`دستگاه ورود`).style(style);
-                        worksheet.cell(1,3).string(`دستگاه خروج`).style(style);
-                        worksheet.cell(1,4).string(`affiliation`).style(style);
-                        worksheet.cell(1,5).string(`member1`).style(style);
-                        worksheet.cell(1,6).string(`member2`).style(style);
-                        worksheet.cell(1,7).string(`member3`).style(style);
-                        worksheet.cell(1,8).string(`member4`).style(style);
-                        worksheet.cell(1,9).string(`member5`).style(style);
+                var worksheet = workbook.addWorksheet(dateConvert.get_persian_month(monthNum) + ' ' + now.year);
+                var style = workbook.createStyle({
+                    font: {
+                    color: '#111111',
+                    size: 12
+                    },
+                    numberFormat: '$#,##0.00; ($#,##0.00); -'
+                });
+                var styleGreen = workbook.createStyle({
+                    font: {
+                    color: '#00AA00',
+                    size: 12
+                    },
+                    numberFormat: '$#,##0.00; ($#,##0.00); -'
+                });
+                var styleBlue = workbook.createStyle({
+                    font: {
+                    color: '#0000AA',
+                    size: 12
+                    },
+                    numberFormat: '$#,##0.00; ($#,##0.00); -'
+                });
+                var styleRed = workbook.createStyle({
+                    font: {
+                    color: '#AA0000',
+                    size: 12
+                    },
+                    numberFormat: '$#,##0.00; ($#,##0.00); -'
+                });
+                worksheet.cell(1,1).string(`ردیف`).style(style);
+                worksheet.cell(1,2).string(`دستگاه ورود`).style(style);
+                worksheet.cell(1,3).string(`دستگاه خروج`).style(style);
+                worksheet.cell(1,4).string(`ساعت ورود`).style(style);
+                worksheet.cell(1,5).string(`ساعت خروج`).style(style);
+                worksheet.cell(1,6).string(`تاریخ`).style(style);
+                worksheet.cell(1,7).string(`زمان حضور`).style(style);
+                worksheet.cell(1,8).string(`مجموع روز`).style(style);
+                worksheet.cell(1,9).string(`مجموع ماه`).style(style);
+                monthData = [];
+                cnt = 2;
+                for(var i=0; i<dateConvert.j_days_in_month[monthNum-1]; i++){
+                    var j_year = now.year;
+                    var j_month = monthNum;
+                    var j_day = i+1;
+                    var j_date = dateConvert.jalali_to_gregorian(j_year, j_month, j_day);
+                    var j_d = new Date(j_date[0], j_date[1]-1, j_date[2], 12, 0, 0, 0);
+                    var thisCommutes = [];
+                    for (let j = 0; j < commutes.length; j++) {
+                        if(commutes[j].j_date.year == j_year && commutes[j].j_date.month == j_month && commutes[j].j_date.day == j_day)
+                            thisCommutes.push(commutes[j]);
                     }
+                    monthData.push({year: j_year, month: j_month, day: j_day, date: j_d, commutes: thisCommutes});
                 }
+                monthSum = {hour: 0, minute: 0, second: 0};
+                colorCnt = 0;
+                for(var i=0; i<monthData.length; i++){
+                    var correct = 0, incorrect = 0, sum = {hour: 0, minute: 0, second: 0}, total = {hour: 0, minute: 0, second: 0};
+                    for(var j=0; j<monthData[i].commutes.length-1; j+=2){
+                        if(monthData[i].commutes[j].Enter && !monthData[i].commutes[j+1].Enter ) {
+                            correct++; 
+                            sum = sumTime(sum, deltaTime(monthData[i].commutes[j].time, monthData[i].commutes[j+1].time))
+                            delta = deltaTime(monthData[i].commutes[j].time, monthData[i].commutes[j+1].time);
+                            if(colorCnt%2 == 0){
+                                style = workbook.createStyle({
+                                    font: {
+                                    color: '#111111',
+                                    size: 12
+                                    },
+                                    fill: {
+                                        type: 'pattern',
+                                        patternType: 'solid',
+                                        bgColor: '#dff7ff',
+                                        fgColor: '#dff7ff',
+                                    },
+                                    numberFormat: '$#,##0.00; ($#,##0.00); -'
+                                });
+                            }else{
+                                style = workbook.createStyle({
+                                    font: {
+                                    color: '#111111',
+                                    size: 12
+                                    },
+                                    fill: {
+                                        type: 'pattern',
+                                        patternType: 'solid',
+                                        bgColor: '#ffe2df',
+                                        fgColor: '#ffe2df',
+                                    },
+                                    numberFormat: '$#,##0.00; ($#,##0.00); -'
+                                });
+                            }
+                            worksheet.cell(cnt,1).string(`${cnt - 1}`).style(style);
+                            worksheet.cell(cnt,2).string(`${monthData[i].commutes[j].deviceID}`).style(style);
+                            worksheet.cell(cnt,3).string(`${monthData[i].commutes[j+1].deviceID}`).style(style);
+                            worksheet.cell(cnt,4).string(`${monthData[i].commutes[j].time.hour}:${monthData[i].commutes[j].time.minute}:${monthData[i].commutes[j].time.second}`).style(style);
+                            worksheet.cell(cnt,5).string(`${monthData[i].commutes[j+1].time.hour}:${monthData[i].commutes[j+1].time.minute}:${monthData[i].commutes[j+1].time.second}`).style(style);
+                            worksheet.cell(cnt,6).string(`${monthData[i].commutes[j].j_date.year}/${monthData[i].commutes[j].j_date.month}/${monthData[i].commutes[j].j_date.day}`).style(style);
+                            worksheet.cell(cnt,7).string(`${delta.hour}:${delta.minute}:${delta.second}`).style(styleGreen);
+                            cnt++;
+                        }
+                        else if(!monthData[i].commutes[j].Enter)    {incorrect++;monthData[i].commutes.splice(j  , 0, 'undefined');}
+                        else if(monthData[i].commutes[j+1].Enter)   {incorrect++;monthData[i].commutes.splice(j+1, 0, 'undefined');}
+                        else incorrect++;
+                    }
+                    if(monthData[i].commutes.length != 0){
+                        worksheet.cell(cnt-1,8).string(`${sum.hour}:${sum.minute}:${sum.second}`).style(styleBlue);
+                        colorCnt++;
+                    }
+                    monthSum = sumTime(monthSum, sum);                    
+                }
+                worksheet.cell(2,9).string(`${monthSum.hour}:${monthSum.minute}:${monthSum.second}`).style(styleRed);
+                if(!fs.existsSync(path.join(__dirname, "/../public/output")))
+                    fs.mkdirSync(path.join(__dirname, "/../public/output"));
+                if(!fs.existsSync(path.join(__dirname, '/../public/output/personel-' + req.query.personelID.toString())))
+                    fs.mkdirSync(path.join(__dirname, '/../public/output/personel-' + req.query.personelID.toString()));
+                workbook.write(`./public/output/personel-${req.query.personelID}/${dateConvert.get_persian_month(monthNum)}_${now.year}.xlsx`);
+                report.push({
+                    name: `${dateConvert.get_persian_month(monthNum)} ${now.year}`,
+                    out: `/output/personel-${req.query.personelID}/${dateConvert.get_persian_month(monthNum)}_${now.year}.xlsx`,
+                    monthData: monthData,
+                    monthSum: monthSum,
+                });
             }
+            res.render('./dashboard/admin-user-report', {
+                user: req.user,
+                report,
+                personelID: req.query.personelID,
+            });
         });
     }
 });
