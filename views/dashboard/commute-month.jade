@@ -29,11 +29,12 @@ block content
                 | #{get_persian_month(parseInt(month)+1)}
                 i.fa.fa-chevron-left
         -}
-    .delete-incorrect-commutes
-        a(href="/dashboard/delete-incorrect-commutes?personelID=#{personelID}&month=#{month}")
-            i.fa.fa-trash
-            | حذف تردد های ناقص زیر یک دقیقه
-
+    -if(user.role == 'admin'){
+        .delete-incorrect-commutes
+            a(href="/dashboard/delete-incorrect-commutes?personelID=#{personelID}&month=#{month}")
+                i.fa.fa-trash
+                | حذف تردد های ناقص زیر یک دقیقه
+    -}
     .commute-area
         -for(var i=0; i<monthData.length; i++){
             .day-view(id="day#{i}" class="#{day_in_week(monthData[i].date) == 'جمعه' || day_in_week(monthData[i].date) == 'پنج شنبه' ? 'holiday': ''}")
