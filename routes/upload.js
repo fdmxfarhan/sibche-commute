@@ -39,11 +39,12 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
         res.send('no file to upload');
     } else {
         var fileName = file.destination.slice(6) + '/' + file.originalname;
-        console.log(fileName);
+        len = file.originalname.length;
+        logName = file.originalname.slice(0, len - 4);
         unrar(__dirname + '/../public' + fileName, './public/log').then(() => {
             console.log('passed');
             var log1, log2, log3, log4;
-            fs.readFile(__dirname + '/../public/log/log 14000415/AGL_001.TXT', function (err, data) {
+            fs.readFile(__dirname + `/../public/log/${logName}/AGL_001.TXT`, function (err, data) {
                 if (err) throw err;
                 log1 = data.toString('UTF8').split('\r\n');
                 for (let i = 0; i < log1.length; i++) {
@@ -57,7 +58,7 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                     }
                 }
                 // console.log(log1)
-                fs.readFile(__dirname + '/../public/log/log 14000415/AGL_002.TXT', function (err, data) {
+                fs.readFile(__dirname + `/../public/log/${logName}/AGL_002.TXT`, function (err, data) {
                     if (err) throw err;
                     log2 = data.toString('UTF8').split('\r\n');
                     for (let i = 0; i < log2.length; i++) {
@@ -71,7 +72,7 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                         }
                     }
                     // console.log(log2)
-                    fs.readFile(__dirname + '/../public/log/log 14000415/AGL_003.TXT', function (err, data) {
+                    fs.readFile(__dirname + `/../public/log/${logName}/AGL_003.TXT`, function (err, data) {
                         if (err) throw err;
                         log3 = data.toString('UTF8').split('\r\n');
                         for (let i = 0; i < log3.length; i++) {
@@ -85,7 +86,7 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                             }
                         }
                         // console.log(log3)
-                        fs.readFile(__dirname + '/../public/log/log 14000415/AGL_004.TXT', function (err, data) {
+                        fs.readFile(__dirname + `/../public/log/${logName}/AGL_004.TXT`, function (err, data) {
                             if (err) throw err;
                             log4 = data.toString('UTF8').split('\r\n');
                             for (let i = 0; i < log4.length; i++) {
@@ -123,15 +124,6 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
             });
         }).catch(err => {if(err) console.log(err);});
         
-        // var startDate = { day, month, year };
-        // var endDate = { day: endDay, month: endMonth, year: endYear };
-        // const newCourse = new Course({ title, description, teacher, session, minAge, maxAge, startDate, capacity, price, cover, endDate });
-        // newCourse.save()
-        //     .then(course => {
-        //         res.redirect(req.body.redirect);
-        //     }).catch(err => {
-        //         if (err) console.log(err);
-        //     });
     }
 });
 
