@@ -1,1 +1,2 @@
-ssh root@185.81.96.144
+sibche_wp
+Hi@sibcheServer_WP1400!
