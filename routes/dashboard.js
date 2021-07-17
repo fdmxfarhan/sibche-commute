@@ -689,4 +689,46 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
     }
 });
 
+router.post('/add-new-log', ensureAuthenticated, (req, res, next) => {
+    var { personelID, enterDeviceID, exitDeviceID, enterDay, enterMonth, enterYear, enterMinute, enterHour, exitDay, exitMonth, exitYear, exitMinute, exitHour } = req.body;
+    if(req.user.role == 'admin')
+    {
+        var gregorian = dateConvert.JalaliDate.jalaliToGregorian(enterYear, enterMonth, enterDay);
+        var date = new Date(gregorian[0], gregorian[1] - 1, gregorian[2], 12, 0, 0, 0);
+        var j_date = {year: parseInt(enterYear), month: parseInt(enterMonth), day: parseInt(enterDay), date: date};
+        var time = {hour: parseInt(enterHour), minute: parseInt(enterMinute), second: 0};
+
+        var enterCommute = new Commute({
+            personelID,
+            date: date,
+            j_date: j_date,
+            time: time,
+            deviceID: enterDeviceID,
+            Enter: true,
+            logID: 'added',
+        });
+        gregorian = dateConvert.JalaliDate.jalaliToGregorian(exitYear, exitMonth, exitDay);
+        date = new Date(gregorian[0], gregorian[1] - 1, gregorian[2], 12, 0, 0, 0);
+        j_date = {year: parseInt(exitYear), month: parseInt(exitMonth), day: parseInt(exitDay), date: date};
+        time = {hour: parseInt(exitHour), minute: parseInt(exitMinute), second: 0};
+
+        var exitCommute = new Commute({
+            personelID,
+            date,
+            j_date,
+            time,
+            deviceID: exitDeviceID,
+            Enter: false,
+            logID: 'added',
+        });
+        console.log(enterCommute);
+        console.log(exitCommute);
+        enterCommute.save().then(doc => {
+            exitCommute.save().then(doc => {
+                res.redirect(`/dashboard/admin-view-user?personelID=${personelID}`)
+            }).catch(err => {if(err) console.log(err);});
+        }).catch(err => {if(err) console.log(err);});
+    }
+});
+
 module.exports = router;

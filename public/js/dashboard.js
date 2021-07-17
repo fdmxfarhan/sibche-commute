@@ -41,12 +41,19 @@ $(document).ready(function(){
         $('#upload-log').fadeIn(500);
         modal.fadeIn(500);
     });
+    $('.add-new-log').click(() => {
+        $('#add-new-log-popup').fadeIn(500);
+        modal.fadeIn(500);
+    });
     modal.click(() => {
         $('#upload-log').fadeOut(500);
+        $('#add-new-log-popup').fadeOut(500);
         modal.fadeOut(500);
     })
     $('.close-popup').click(() => {
         $('#upload-log').fadeOut(500);
+        $('#add-new-log-popup').fadeOut(500);
         modal.fadeOut(500);
     })
+
 });

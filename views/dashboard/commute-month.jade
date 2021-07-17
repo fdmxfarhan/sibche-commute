@@ -30,10 +30,14 @@ block content
                 i.fa.fa-chevron-left
         -}
     -if(user.role == 'admin'){
-        .delete-incorrect-commutes
-            a(href="/dashboard/delete-incorrect-commutes?personelID=#{personelID}&month=#{month}")
-                i.fa.fa-trash
-                | حذف تردد های ناقص زیر یک دقیقه
+        .admin-nav
+            .delete-incorrect-commutes
+                a(href="/dashboard/delete-incorrect-commutes?personelID=#{personelID}&month=#{month}")
+                    i.fa.fa-trash
+                    | حذف تردد های ناقص زیر یک دقیقه
+            .add-new-log 
+                i.fa.fa-plus 
+                | افزودن تردد
     -}
     .commute-area
         -for(var i=0; i<monthData.length; i++){
@@ -287,4 +291,39 @@ block content
             -}
             
         -}
+    .popup-area#add-new-log-popup
+        .popup
+            i.fa.fa-times.close-popup
+            h1.popup-title پرسنل شماره #{personelID}
+            form(action="/dashboard/add-new-log" method="POST") 
+                input.hidden(type="number" name="personelID" value="#{personelID}")
+                input.hidden(type="number" name="enterDeviceID" value="2")
+                input.hidden(type="number" name="exitDeviceID" value="1")
+                .part 
+                    .title.green ورود
+                    .date-input 
+                        input(type="number" name="enterDay" placeholder="روز")
+                        | /
+                        input(type="number" name="enterMonth" placeholder="ماه")
+                        | /
+                        input(type="number" name="enterYear" placeholder="سال")
+                    .time-input 
+                        input(type="number" name="enterMinute" placeholder="دقیقه")
+                        | :
+                        input(type="number" name="enterHour" placeholder="ساعت")
+                .part 
+                    .title.blue خروج
+                    .date-input 
+                        input(type="number" name="exitDay" placeholder="روز")
+                        | /
+                        input(type="number" name="exitMonth" placeholder="ماه")
+                        | /
+                        input(type="number" name="exitYear" placeholder="سال")
+                    .time-input 
+                        input(type="number" name="exitMinute" placeholder="دقیقه")
+                        | :
+                        input(type="number" name="exitHour" placeholder="ساعت")
+                
+                input.submit(type="submit" value="ثبت")
+
     script(src="/js/dashboard.js") 
