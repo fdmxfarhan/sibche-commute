@@ -197,6 +197,38 @@ body{
         text-align: center;
         margin-bottom: 1vw;
     }
+    .date-area{
+        overflow: hidden;
+    }
+    .date-area .title{
+        float: right;
+        margin-left: 1vw;
+    }
+    .popup-area#upload-log .date-input{
+        border: none;
+        box-shadow: 0 0 0.3vw 0.1vw rgba(0, 0, 0, 0.2);
+        border-radius: 1.5vw;
+        width: 40%;
+        margin: auto;
+        margin-top: 1vw;
+        margin-bottom: 1vw;
+        text-align: center;
+        /* display: inline; */
+        float: right;
+    }
+    .popup-area#upload-log .date-input input{
+        border: none;
+        font-family: 'iransans';
+        font-size: 1.1vw;
+        width: 20%;
+        text-align: center;
+        padding: 0.4vw 1vw;
+        border-bottom: transparent 0.1vw solid;
+    }
+    .popup-area#upload-log .date-input input:focus{
+        outline: none;
+        border-bottom: var(--blue) 0.1vw solid;
+    }
 }
 
 @media only screen and (max-width: 800px) {

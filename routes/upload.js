@@ -11,8 +11,8 @@ const {unrar, list} = require('unrar-promise');
 const Log = require('../models/Log');
 const dateConvert = require('../config/dateConvert');
 
-router.use(bodyparser.urlencoded({ extended: true }));
 
+router.use(bodyparser.urlencoded({ extended: true }));
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         const dir = 'public/files/' + Date.now().toString();
@@ -22,19 +22,20 @@ var storage = multer.diskStorage({
         cb(null, file.originalname)
     }
 });
-
 var upload = multer({ storage: storage });
+
 
 async function extractRar(fileName){
     await unrar(__dirname + '/../public/log 14000415.rar', './public/log');
 };
 
-
-
 router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, next) => {
     const file = req.file;
-    const { title } = req.body;
-
+    const { title, beginDay, beginMonth, beginYear, endDay, endMonth, endYear } = req.body;
+    var begin_greg = dateConvert.jalali_to_gregorian(parseInt(beginYear), parseInt(beginMonth), parseInt(beginDay));
+    var end_greg = dateConvert.jalali_to_gregorian(parseInt(endYear), parseInt(endMonth), parseInt(endDay));
+    var begin = new Date(begin_greg[0], begin_greg[1] - 1, begin_greg[2], 12, 0, 0);
+    var end = new Date(end_greg[0], end_greg[1] - 1, end_greg[2], 12, 0, 0);
     if (!file) {
         res.send('no file to upload');
     } else {
@@ -55,6 +56,15 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                         log1[i][2] = parseInt(log1[i][2]);
                         log1[i][4] = parseInt(log1[i][4]);
                         log1[i][5] = parseInt(log1[i][5]);
+                        if(log1[i][6]){
+                            var timeDate = log1[i][6].split(' ')[0];
+                            var date = timeDate.split('/');
+                            date = new Date(parseInt(date[0]), parseInt(date[1]) - 1, parseInt(date[2]), 12, 0, 0);
+                            if(date.getTime() < begin.getTime() || date.getTime() > end.getTime()){
+                                log1.splice(i , 1);
+                                i--;
+                            }
+                        }
                     }
                 }
                 // console.log(log1)
@@ -69,6 +79,15 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                             log2[i][2] = parseInt(log2[i][2]);
                             log2[i][4] = parseInt(log2[i][4]);
                             log2[i][5] = parseInt(log2[i][5]);
+                            if(log2[i][6]){
+                                var timeDate = log2[i][6].split(' ')[0];
+                                var date = timeDate.split('/');
+                                date = new Date(parseInt(date[0]), parseInt(date[1]) - 1, parseInt(date[2]), 12, 0, 0);
+                                if(date.getTime() < begin.getTime() || date.getTime() > end.getTime()){
+                                    log2.splice(i , 1);
+                                    i--;
+                                }
+                            }
                         }
                     }
                     // console.log(log2)
@@ -83,6 +102,15 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                                 log3[i][2] = parseInt(log3[i][2]);
                                 log3[i][4] = parseInt(log3[i][4]);
                                 log3[i][5] = parseInt(log3[i][5]);
+                                if(log3[i][6]){
+                                    var timeDate = log3[i][6].split(' ')[0];
+                                    var date = timeDate.split('/');
+                                    date = new Date(parseInt(date[0]), parseInt(date[1]) - 1, parseInt(date[2]), 12, 0, 0);
+                                    if(date.getTime() < begin.getTime() || date.getTime() > end.getTime()){
+                                        log3.splice(i , 1);
+                                        i--;
+                                    }
+                                }
                             }
                         }
                         // console.log(log3)
@@ -97,6 +125,15 @@ router.post('/log', ensureAuthenticated, upload.single('myFile'), (req, res, nex
                                     log4[i][2] = parseInt(log4[i][2]);
                                     log4[i][4] = parseInt(log4[i][4]);
                                     log4[i][5] = parseInt(log4[i][5]);
+                                    if(log4[i][6]){
+                                        var timeDate = log4[i][6].split(' ')[0];
+                                        var date = timeDate.split('/');
+                                        date = new Date(parseInt(date[0]), parseInt(date[1]) - 1, parseInt(date[2]), 12, 0, 0);
+                                        if(date.getTime() < begin.getTime() || date.getTime() > end.getTime()){
+                                            log4.splice(i , 1);
+                                            i--;
+                                        }
+                                    }
                                 }
                             }
                             // console.log(log4)

@@ -6,7 +6,24 @@
             label(for="title") عنوان فایل:
             input.text-input(type="text" name="title" required placeholder="عنوان فایل...")
             br
+            .date-area
+                .title از تاریخ 
+                .date-input 
+                    input(type="number" name="beginDay" placeholder="روز")
+                    | /
+                    input(type="number" name="beginMonth" placeholder="ماه")
+                    | /
+                    input(type="number" name="beginYear" placeholder="سال")
+            .date-area
+                .title تا تاریخ 
+                .date-input 
+                    input(type="number" name="endDay" placeholder="روز")
+                    | /
+                    input(type="number" name="endMonth" placeholder="ماه")
+                    | /
+                    input(type="number" name="endYear" placeholder="سال")
+            
             .upload-area فایل خود را انتخاب کنید
                 i.fa.fa-cloud-upload
-                input.file(type="file" name="myFile" required)
+                input.file(type="file" name="myFile")
             input.submit(type="submit" value="آپلود")

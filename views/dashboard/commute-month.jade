@@ -12,6 +12,7 @@ block content
                 ul 
                     li به پنل کاربری خود خوش آمدید
         -}
+    
     h1.title #{get_persian_month(parseInt(month))} ماه #{now.year}
         -if(user.role == 'admin'){
             .gray.inline.small (پرسنل شماره #{personelID})
@@ -29,6 +30,7 @@ block content
                 | #{get_persian_month(parseInt(month)+1)}
                 i.fa.fa-chevron-left
         -}
+    
     -if(user.role == 'admin'){
         .admin-nav
             .delete-incorrect-commutes
@@ -39,6 +41,7 @@ block content
                 i.fa.fa-plus 
                 | افزودن تردد
     -}
+
     .commute-area
         -for(var i=0; i<monthData.length; i++){
             .day-view(id="day#{i}" class="#{day_in_week(monthData[i].date) == 'جمعه' || day_in_week(monthData[i].date) == 'پنج شنبه' ? 'holiday': ''}")
@@ -291,6 +294,7 @@ block content
             -}
             
         -}
+
     .popup-area#add-new-log-popup
         .popup
             i.fa.fa-times.close-popup
