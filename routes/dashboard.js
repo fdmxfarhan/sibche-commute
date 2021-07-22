@@ -656,12 +656,12 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                         fullTime.cell(i+2,8).string(`${late.hour}:${late.minute}:${late.second}`).style(styleRed);
                     }else if(getSec(start) > 10 * 60 * 60){
                         fullTime.cell(i+2,5).string(`غیبت (تاخیر در ورود)`).style(styleRed);
-                        late = deltaTime(start, {hour: 8, minute: 30, second: 0});
+                        late = deltaTime(start, {hour: 10, minute: 0, second: 0});
                         fullTime.cell(i+2,7).string(`${late.hour}:${late.minute}:${late.second}`).style(styleRed);
                     }else{
                         fullTime.cell(i+2,5).string(`حضور`).style(styleGreen);
                         if(getSec(total) > 9 * 60 * 60){
-                            extra = deltaTime(total, {hour: 9, minute: 0, second: 0});
+                            extra = deltaTime(sum, {hour: 7, minute: 30, second: 0});
                             fullTime.cell(i+2,6).string(`${extra.hour}:${extra.minute}:${extra.second}`).style(styleGreen);
                         }
                     }
