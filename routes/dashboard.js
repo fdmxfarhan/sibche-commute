@@ -499,6 +499,10 @@ router.get('/report', ensureAuthenticated, (req, res, next) => {
     }
 });
 
+var timeToString = (time) => {
+    return(`${time.hour < 10 ? '0'+ time.hour : time.hour}:${time.minute < 10 ? '0' + time.minute : time.minute}:${time.second < 10 ? '0' + time.second : time.second}`)
+}
+
 router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
     var now = getNow();
     if(req.user.role == 'admin')
@@ -507,7 +511,9 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
             commutes.sort(sortAlgorithm);
             report = [];
             for(var monthNum=1; monthNum<=12; monthNum++){
-                var workbook = new excel.Workbook();
+                var workbook = new excel.Workbook({
+                    dateFormat: 'm/d/yy hh:mm:ss'
+                });
                 var worksheet = workbook.addWorksheet('گزارش تردد');
                 var fullTime = workbook.addWorksheet('تمام وقت');
                 var style = workbook.createStyle({
@@ -538,6 +544,13 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                     },
                     numberFormat: '$#,##0.00; ($#,##0.00); -'
                 });
+                var styleGray = workbook.createStyle({
+                    font: {
+                    color: '#cccccc',
+                    size: 12
+                    },
+                    numberFormat: '$#,##0.00; ($#,##0.00); -'
+                });
                 worksheet.cell(1,1).string(`ردیف`).style(style);
                 worksheet.cell(1,2).string(`دستگاه ورود`).style(style);
                 worksheet.cell(1,3).string(`دستگاه خروج`).style(style);
@@ -547,7 +560,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                 worksheet.cell(1,7).string(`زمان حضور`).style(style);
                 worksheet.cell(1,8).string(`مجموع روز`).style(style);
                 worksheet.cell(1,9).string(`total`).style(style);
-                worksheet.cell(1,10).string(`مجموع ماه`).style(style);
+                // worksheet.cell(1,10).string(`مجموع ماه`).style(style);
 
                 // fullTime.cell(1,1).string(`ردیف`).style(style);
                 fullTime.cell(1,1).string(`روز`).style(style);
@@ -575,6 +588,11 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                     monthData.push({year: j_year, month: j_month, day: j_day, date: j_d, commutes: thisCommutes});
                 }
                 monthSum = {hour: 0, minute: 0, second: 0};
+                monthTotal = {hour: 0, minute: 0, second: 0};
+                monthExtra = {hour: 0, minute: 0, second: 0};
+                monthEnterLate = {hour: 0, minute: 0, second: 0};
+                monthLate = {hour: 0, minute: 0, second: 0};
+                presence = 0;
                 colorCnt = 0;
                 for(var i=0; i<monthData.length; i++){
                     var correct = 0, incorrect = 0, sum = {hour: 0, minute: 0, second: 0}, total = {hour: 0, minute: 0, second: 0};
@@ -615,10 +633,10 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                             worksheet.cell(cnt,1).string(`${cnt - 1}`).style(style);
                             worksheet.cell(cnt,2).string(`${monthData[i].commutes[j].deviceID}`).style(style);
                             worksheet.cell(cnt,3).string(`${monthData[i].commutes[j+1].deviceID}`).style(style);
-                            worksheet.cell(cnt,4).string(`${monthData[i].commutes[j].time.hour}:${monthData[i].commutes[j].time.minute}:${monthData[i].commutes[j].time.second}`).style(style);
-                            worksheet.cell(cnt,5).string(`${monthData[i].commutes[j+1].time.hour}:${monthData[i].commutes[j+1].time.minute}:${monthData[i].commutes[j+1].time.second}`).style(style);
+                            worksheet.cell(cnt,4).string(timeToString(monthData[i].commutes[j].time)).style(style);
+                            worksheet.cell(cnt,5).string(timeToString(monthData[i].commutes[j+1].time)).style(style);
                             worksheet.cell(cnt,6).string(`${monthData[i].commutes[j].j_date.year}/${monthData[i].commutes[j].j_date.month}/${monthData[i].commutes[j].j_date.day}`).style(style);
-                            worksheet.cell(cnt,7).string(`${delta.hour}:${delta.minute}:${delta.second}`).style(styleGreen);
+                            worksheet.cell(cnt,7).string(timeToString(delta)).style(styleGreen);
                             cnt++;
                         }
                         else if(!monthData[i].commutes[j].Enter)    {incorrect++;monthData[i].commutes.splice(j  , 0, 'undefined');}
@@ -633,8 +651,8 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                     var total = deltaTime(start, end);
 
                     if(monthData[i].commutes.length != 0){
-                        worksheet.cell(cnt-1,8).string(`${sum.hour}:${sum.minute}:${sum.second}`).style(styleBlue);
-                        worksheet.cell(cnt-1,9).string(`${total.hour}:${total.minute}:${total.second}`).style(styleBlue);
+                        worksheet.cell(cnt-1,8).string(timeToString(sum)).style(styleBlue);
+                        worksheet.cell(cnt-1,9).string(timeToString(total)).style(styleBlue);
                         colorCnt++;
                     }
                     style = workbook.createStyle({
@@ -648,26 +666,49 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                     total = deltaTime(start, end);
                     fullTime.cell(i+2,1).string(`${dateConvert.day_in_week(monthData[i].date)}`).style(style);
                     fullTime.cell(i+2,2).string(`${monthData[i].year}/${monthData[i].month}/${monthData[i].day}`).style(style);
-                    fullTime.cell(i+2,3).string(`${sum.hour}:${sum.minute}:${sum.second}`).style(style);
-                    fullTime.cell(i+2,4).string(`${total.hour}:${total.minute}:${total.second}`).style(style);
-                    if(getSec(sum) < 7.5 * 60 * 60){
+                    fullTime.cell(i+2,3).string(timeToString(sum)).style(style);
+                    fullTime.cell(i+2,4).string(timeToString(total)).style(style);
+                    if(dateConvert.day_in_week(monthData[i].date) == 'پنج شنبه' || dateConvert.day_in_week(monthData[i].date) == 'جمعه'){
+                        fullTime.cell(i+2,5).string(`تعطیل`).style(styleGray);
+                        if(getSec(sum) > 0){
+                            fullTime.cell(i+2,6).string(timeToString(sum)).style(styleGreen);
+                        }
+                    }else if(getSec(sum) < 7.5 * 60 * 60){
                         fullTime.cell(i+2,5).string(`غیبت (ساعتی)`).style(styleRed);
                         late = deltaTime(sum, {hour: 7, minute: 30, second: 0});
-                        fullTime.cell(i+2,8).string(`${late.hour}:${late.minute}:${late.second}`).style(styleRed);
+                        monthLate = sumTime(monthLate, late);
+                        fullTime.cell(i+2,8).string(timeToString(late)).style(styleRed);
                     }else if(getSec(start) > 10 * 60 * 60){
                         fullTime.cell(i+2,5).string(`غیبت (تاخیر در ورود)`).style(styleRed);
                         late = deltaTime(start, {hour: 10, minute: 0, second: 0});
-                        fullTime.cell(i+2,7).string(`${late.hour}:${late.minute}:${late.second}`).style(styleRed);
+                        monthEnterLate = sumTime(monthEnterLate, late);
+                        fullTime.cell(i+2,7).string(timeToString(late)).style(styleRed);
                     }else{
                         fullTime.cell(i+2,5).string(`حضور`).style(styleGreen);
+                        presence++;
                         if(getSec(total) > 9 * 60 * 60){
                             extra = deltaTime(sum, {hour: 7, minute: 30, second: 0});
-                            fullTime.cell(i+2,6).string(`${extra.hour}:${extra.minute}:${extra.second}`).style(styleGreen);
+                            monthExtra = sumTime(monthExtra, extra);
+                            fullTime.cell(i+2,6).string(timeToString(extra)).style(styleGreen);
                         }
                     }
-                    monthSum = sumTime(monthSum, sum);                    
+                    monthSum = sumTime(monthSum, sum);
+                    monthTotal = sumTime(monthTotal, total);
                 }
-                worksheet.cell(2,10).string(`${monthSum.hour}:${monthSum.minute}:${monthSum.second}`).style(styleRed);
+                // worksheet.cell(2,10).string(timeToString(monthSum)).style(styleRed);
+                worksheet.cell(cnt + 1,1).string('مجموع').style(styleBlue);
+                worksheet.cell(cnt + 1,7).string(timeToString(monthSum)).style(styleBlue);
+                worksheet.cell(cnt + 1,8).string(timeToString(monthSum)).style(styleBlue);
+                worksheet.cell(cnt + 1,9).string(timeToString(monthTotal)).style(styleBlue);
+
+                fullTime.cell(monthData.length+3,1).string('مجموع').style(styleBlue);
+                fullTime.cell(monthData.length+3,3).string(timeToString(monthSum)).style(styleBlue);
+                fullTime.cell(monthData.length+3,4).string(timeToString(monthTotal)).style(styleBlue);
+                fullTime.cell(monthData.length+3,5).string(`${presence}`).style(styleBlue);
+                fullTime.cell(monthData.length+3,6).string(timeToString(monthExtra)).style(styleGreen);
+                fullTime.cell(monthData.length+3,7).string(timeToString(monthEnterLate)).style(styleBlue);
+                fullTime.cell(monthData.length+3,8).string(timeToString(monthLate)).style(styleBlue);
+                
                 if(!fs.existsSync(path.join(__dirname, "/../public/output")))
                     fs.mkdirSync(path.join(__dirname, "/../public/output"));
                 if(!fs.existsSync(path.join(__dirname, '/../public/output/personel-' + req.query.personelID.toString())))
