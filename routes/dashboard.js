@@ -578,7 +578,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                 }
                 monthSum = {hour: 0, minute: 0, second: 0};
                 monthTotal = {hour: 0, minute: 0, second: 0};
-                monthExtra = {hour: 0, minute: 0, second: 0};
+                monthExtraTime = {hour: 0, minute: 0, second: 0};
                 monthEnterLate = {hour: 0, minute: 0, second: 0};
                 monthLate = {hour: 0, minute: 0, second: 0};
                 presence = 0;
@@ -677,7 +677,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                         presence++;
                         if(getSec(total) > 9 * 60 * 60){
                             extra = deltaTime(sum, {hour: 7, minute: 30, second: 0});
-                            monthExtra = sumTime(monthExtra, extra);
+                            monthExtraTime = sumTime(monthExtraTime, extra);
                             fullTime.cell(i+2,6).string(timeToString(extra)).style(styleGreen);
                         }
                     }
@@ -694,7 +694,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                 fullTime.cell(monthData.length+3,3).string(timeToString(monthSum)).style(styleBlue);
                 fullTime.cell(monthData.length+3,4).string(timeToString(monthTotal)).style(styleBlue);
                 fullTime.cell(monthData.length+3,5).string(`${presence}`).style(styleBlue);
-                fullTime.cell(monthData.length+3,6).string(timeToString(monthExtra)).style(styleGreen);
+                fullTime.cell(monthData.length+3,6).string(timeToString(monthExtraTime)).style(styleGreen);
                 fullTime.cell(monthData.length+3,7).string(timeToString(monthEnterLate)).style(styleBlue);
                 fullTime.cell(monthData.length+3,8).string(timeToString(monthLate)).style(styleBlue);
                 
