@@ -698,7 +698,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                 fullTime.cell(monthData.length+3,5).string(`${presence}`).style(styleBlue);
                 fullTime.cell(monthData.length+3,6).string(timeToString(monthExtraTime)).style(styleGreen);
                 fullTime.cell(monthData.length+3,7).string(timeToString(monthEnterLate)).style(styleBlue);
-                fullTime.cell(monthData.length+3,8).string(timeToString(monthLate)).style(styleBlue);
+                fullTime.cell(monthData.length+3,8).string(timeToString(deltaTime(monthLate, {hour: 7, minute: 30, second: 0}))).style(styleBlue);
                 
                 if(!fs.existsSync(path.join(__dirname, "/../public/output")))
                     fs.mkdirSync(path.join(__dirname, "/../public/output"));
@@ -847,6 +847,7 @@ router.get('/admin-general-report', ensureAuthenticated, (req, res, next) => {
                         if(dateConvert.day_in_week(monthData[i].date) == 'پنج شنبه' || dateConvert.day_in_week(monthData[i].date) == 'جمعه'){
                             // fullTime.cell(i+2,5).string(`تعطیل`).style(styleGray);
                             if(getSec(sum) > 0){
+                                monthExtra = sumTime(monthExtra, sum);
                                 // fullTime.cell(i+2,6).string(timeToString(sum)).style(styleGreen);
                             }
                         }else if(getSec(sum) < 7.5 * 60 * 60){
@@ -880,7 +881,7 @@ router.get('/admin-general-report', ensureAuthenticated, (req, res, next) => {
                     report[monthNum-1].ws.cell(userNum+2,5).string(`${apsence}`).style(report[monthNum-1].style);
                     report[monthNum-1].ws.cell(userNum+2,6).string(timeToString(monthExtra)).style(report[monthNum-1].style);
                     report[monthNum-1].ws.cell(userNum+2,7).string(timeToString(monthEnterLate)).style(report[monthNum-1].style);
-                    report[monthNum-1].ws.cell(userNum+2,8).string(timeToString(monthLate)).style(report[monthNum-1].style);
+                    report[monthNum-1].ws.cell(userNum+2,8).string(timeToString(deltaTime(monthLate, {hour: 7, minute: 30, second: 0}))).style(report[monthNum-1].style);
                 }
             }
             if(!fs.existsSync(path.join(__dirname, "/../public/output")))
