@@ -1,0 +1,36 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(login){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li به پنل مدیریت خوش آمدید
+        -}
+    h1.title.center گزارش کلی
+
+    .report-area
+        table 
+            tr 
+                th عنوان
+                //- th مجموع ساعت حضور
+                th گزارش تردد
+            -for(var i=0; i<report.length; i++){
+                tr 
+                    td= report[i].name
+                    //- td #{report[i].monthSum.hour}:#{report[i].monthSum.minute}:#{report[i].monthSum.second}
+                    td
+                        a(href="#{report[i].out}") 
+                            i.fa.fa-cloud-download 
+                            | دانلود
+            -}
+    
+    
+    script(src="/js/dashboard.js") 
+
+

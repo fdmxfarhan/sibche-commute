@@ -13,7 +13,7 @@ block content
                     li به پنل مدیریت خوش آمدید
         -}
     h1.title.center گزارشات
-
+    a.general-report(href="/dashboard/admin-general-report?users=#{users}") گزارش کلی
     .cards-area
         -for(var i=0; i<users.length; i++){
             a(href="/dashboard/admin-report-user?personelID=#{users[i]}") 

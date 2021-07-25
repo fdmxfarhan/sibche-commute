@@ -639,6 +639,26 @@
         -webkit-appearance: none;
         margin: 0;
     }
+    a.general-report{
+        background-color: var(--blue);
+        color: white;
+        border-radius: 2vw;
+        text-decoration: none;
+        font-family: 'iransans';
+        font-size: 1.2vw;
+        padding: 0.5vw 2vw;
+        margin-right: 5%;
+        margin-bottom: 0.5vw;
+        margin-top: 1.5vw;
+        display: block;
+        width: fit-content;
+        cursor: pointer;
+        transition-duration: 500ms;
+    }
+    a.general-report:hover{
+        background-color: var(--hover);
+    }
+
 }
 
 @media only screen and (max-width: 800px) {
