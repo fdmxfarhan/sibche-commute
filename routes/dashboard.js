@@ -661,6 +661,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                         fullTime.cell(i+2,5).string(`تعطیل`).style(styleGray);
                         if(getSec(sum) > 0){
                             fullTime.cell(i+2,6).string(timeToString(sum)).style(styleGreen);
+                            monthExtraTime = sumTime(monthExtraTime, sum);
                         }
                     }else if(getSec(sum) < 7.5 * 60 * 60){
                         fullTime.cell(i+2,5).string(`غیبت (ساعتی)`).style(styleRed);
@@ -678,6 +679,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                         if(getSec(total) > 9 * 60 * 60){
                             extra = deltaTime(sum, {hour: 7, minute: 30, second: 0});
                             monthExtraTime = sumTime(monthExtraTime, extra);
+                            // if(monthNum == 4) console.log(monthExtraTime);
                             fullTime.cell(i+2,6).string(timeToString(extra)).style(styleGreen);
                         }
                     }
