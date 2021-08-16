@@ -672,6 +672,7 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                         fullTime.cell(i+2,5).string(`غیبت (تاخیر در ورود)`).style(styleRed);
                         late = deltaTime(start, {hour: 10, minute: 0, second: 0});
                         monthEnterLate = sumTime(monthEnterLate, late);
+                        monthExtraTime = sumTime(monthExtraTime, sum);
                         fullTime.cell(i+2,7).string(timeToString(late)).style(styleRed);
                     }else{
                         fullTime.cell(i+2,5).string(`حضور`).style(styleGreen);
