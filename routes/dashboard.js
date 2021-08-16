@@ -672,7 +672,13 @@ router.get('/admin-report-user', ensureAuthenticated, (req, res, next) => {
                         fullTime.cell(i+2,5).string(`غیبت (تاخیر در ورود)`).style(styleRed);
                         late = deltaTime(start, {hour: 10, minute: 0, second: 0});
                         monthEnterLate = sumTime(monthEnterLate, late);
-                        monthExtraTime = sumTime(monthExtraTime, sum);
+                        if(getSec(total) > 9 * 60 * 60){
+                            extra = deltaTime(sum, {hour: 7, minute: 30, second: 0});
+                            monthExtraTime = sumTime(monthExtraTime, extra);
+                            // if(monthNum == 4) console.log(monthExtraTime);
+                            fullTime.cell(i+2,6).string(timeToString(extra)).style(styleGreen);
+                        }
+                        //monthExtraTime = sumTime(monthExtraTime, sum);
                         fullTime.cell(i+2,7).string(timeToString(late)).style(styleRed);
                     }else{
                         fullTime.cell(i+2,5).string(`حضور`).style(styleGreen);
@@ -862,6 +868,11 @@ router.get('/admin-general-report', ensureAuthenticated, (req, res, next) => {
                             late = deltaTime(start, {hour: 10, minute: 0, second: 0});
                             monthEnterLate = sumTime(monthEnterLate, late);
                             apsence++;
+                            if(getSec(total) > 9 * 60 * 60){
+                                extra = deltaTime(sum, {hour: 7, minute: 30, second: 0});
+                                monthExtra = sumTime(monthExtra, extra);
+                                // fullTime.cell(i+2,6).string(timeToString(extra)).style(styleGreen);
+                            }
                             // fullTime.cell(i+2,7).string(timeToString(late)).style(styleRed);
                         }else{
                             // fullTime.cell(i+2,5).string(`حضور`).style(styleGreen);
