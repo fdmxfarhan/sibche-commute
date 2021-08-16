@@ -1,2 +1,4 @@
-public/
+./public/files/*
+./public/output/*
+./public/log/*
 ssh.txt
