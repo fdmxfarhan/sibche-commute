@@ -22,6 +22,10 @@ var UserSchema = new mongoose.Schema({
   },
   avatar: Number,
   course: [Object],
+  passwordChanged: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 var User = mongoose.model('User', UserSchema);

@@ -12,6 +12,14 @@ block content
                 ul 
                     li به پنل کاربری خود خوش آمدید
         -}
+        -if(!user.passwordChanged && user.role == 'user')
+            .notif-msg
+                i.fa.fa-times.close-notif-msg
+                ul 
+                    li لطفا برای تغیر رمز عبور خود 
+                        a(href="/dashboard/settings") اینجا 
+                        | کلیک کنید.
+                
     h1.title #{get_persian_month(parseInt(month))} ماه #{now.year}
         -if(user.role == 'admin'){
             .gray.inline.small (پرسنل شماره #{personelID})

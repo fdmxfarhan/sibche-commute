@@ -913,6 +913,24 @@ router.get('/admin-general-report', ensureAuthenticated, (req, res, next) => {
     
 });
 
+router.get('/settings', ensureAuthenticated, (req, res, next) => {
+    res.render('./dashboard/user-settings', {
+        user: req.user,
+        changed: req.query.changed,
+    })
+});
 
+router.post('/change-password', ensureAuthenticated, (req, res, next) => {
+    var {password, confirmpassword} = req.body
+    if(!password || !confirmpassword) res.send('Error');
+    else if(password == confirmpassword){
+        bcrypt.genSalt(10, (err, salt) => bcrypt.hash(password, salt, (err, hash) => {
+            if(err) throw err;
+            User.updateMany({_id: req.user._id}, {$set: {password: hash, passwordChanged: true}}, (err) => {
+                res.redirect('/dashboard/settings?changed=true');
+            })
+        }))
+    }
+});
 
 module.exports = router;

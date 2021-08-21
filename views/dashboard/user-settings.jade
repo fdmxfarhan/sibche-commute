@@ -1,0 +1,28 @@
+extends layout
+
+block styles
+    link(rel="stylesheet", href="/css/css-circular-prog-bar.css")
+    link(rel="stylesheet", href="/css/dashboard/dashboard.css")
+
+block content
+    .message-area
+        -if(changed){
+            .success-msg
+                i.fa.fa-times.close-success-msg
+                ul 
+                    li رمز عبور جدید با موفقیت ثبت شد.
+        -}
+    h1.title تنظیمات
+    .settings-view
+        form(action="/dashboard/change-password" method="POST") 
+            .text-input-area
+                input.textinput(type="password" placeholder="رمز عبور" name="password" required)
+                i.fa.fa-key
+            .text-input-area
+                input.textinput(type="password" placeholder="تایید رمز عبور" name="confirmpassword" required)
+                i.fa.fa-check
+            .text-input-area
+                button.submit(type="submit") ثبت نام
+            
+    script(src="/js/settings.js") 
+    

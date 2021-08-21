@@ -150,6 +150,10 @@ body{
         padding: 0.3vw 1vw;
         position: relative;
     }
+    .dashboard .content-area .message-area .notif-msg a{
+        text-decoration: none;
+        font-family: 'iransans';
+    }
     .dashboard .content-area .message-area i.close-success-msg, .dashboard .content-area .message-area i.close-notif-msg{
         position: absolute;
         left: 1vw;
@@ -228,6 +232,64 @@ body{
     .popup-area#upload-log .date-input input:focus{
         outline: none;
         border-bottom: var(--blue) 0.1vw solid;
+    }
+    .settings-view{
+
+    }
+    .settings-view .text-input-area{
+        position: relative;
+        width: 50%;
+        margin: 1.5vw auto;
+
+        /* background-color: lightblue; */
+    }
+    .settings-view input.textinput{
+        display: block;
+        width: 35vw;
+        border: none;
+        border-radius: 2vw;
+        padding: 0.5vw 1vw;
+        padding-right: 3vw;
+        font-family: 'iransans';
+        font-size: 1.2vw;
+        border: #ae00ff3b 0.1vw solid;
+        box-shadow: 0 0.3vw 0.8vw 0.2vw #5b167a3b;
+        text-align: right;
+        direction: rtl;
+        position: relative;
+        /* background-color: lightblue; */
+    }
+    .settings-view input.textinput:focus{
+        outline: none;
+        border: purple 0.1vw solid;
+    }
+    .settings-view .text-input-area i{
+        position: absolute;
+        right: 1vw;
+        top: 1vw;
+        color: var(--blue);
+        font-size: 1.3vw;
+    }
+    .settings-view button.submit{
+        cursor: pointer;
+        width: 98%;
+        display: block;
+        color: white;
+        background-color: var(--blue);
+        border: none;
+        border-radius: 2vw;
+        padding: 0.6vw 1vw;
+        padding-right: 3vw;
+        margin: 2vw 0;
+        font-family: 'iransans';
+        font-size: 1.2vw;
+        text-align: center;
+    }
+    .settings-view button.submit:hover{
+        background-color: chocolate;
+    }
+    .settings-view button.submit:focus{
+        outline: none;
     }
 }
 
