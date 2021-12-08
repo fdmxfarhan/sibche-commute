@@ -11,12 +11,7 @@ sudo apt install npm
 ```
 5. Install **mongodb-org** using the command below.
 ```
-curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-apt-key list
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-sudo apt update
-sudo apt install mongodb-org
-sudo systemctl start mongod.service
+sudo apt-get install mongodb
 ```
 6. Install **nodemon** and **forever** globaly using `npm` and the command below.
 ```
