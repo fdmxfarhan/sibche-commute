@@ -3,11 +3,10 @@ Commute management systom for sibche. This app is based on `node.js` framework a
 # Requirements 
 2. Install **nodejs** using the command below. for checking the version you installed use `node -v`.
 ```
-sudo apt install nodejs
-```
-3. Install **npm** using the command below. for checking the version you installed use `npm -v`.
-```
-sudo apt install npm
+sudo apt-get update
+sudo apt-get -y install curl dirmngr apt-transport-https lsb-release ca-certificates vim
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get -y install nodejs
 ```
 5. Install **mongodb-org** using the command below.
 ```
